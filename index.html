@@ -58,6 +58,9 @@
   .links a:hover { background: var(--accent); color: var(--bg); }
 
   h2 { font-size: 1.4rem; margin-bottom: 24px; }
+  /* nagłówek ma stałą czcionkę i układ, żeby nie skakał przy zmianie motywu (zmieniają się tylko kolory) */
+  header { font-family: 'Inter', system-ui, sans-serif; }
+  header h1 { letter-spacing: 0; text-transform: none; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 28px; }
 
   .project {
