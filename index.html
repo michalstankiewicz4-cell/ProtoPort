@@ -92,6 +92,32 @@
     main { height: auto; display: block; }
     .scroll { overflow: visible; }
   }
+  /* ===== prawy panel zabawek: position:fixed, więc nie rusza środkowej kolumny ===== */
+  .toys {
+    position: fixed; top: 40px; left: calc(50% + 490px + 24px);
+    width: min(220px, calc(50vw - 490px - 48px));
+    display: none; flex-direction: column; gap: 10px; z-index: 5;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  @media (min-width: 1400px) { .toys { display: flex; } }
+  .toys-title { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; opacity: .55; margin: 0 0 2px; }
+  .toys button {
+    font: inherit; font-size: .9rem; color: var(--fg); background: transparent; text-align: left;
+    border: 1px solid var(--accent); border-radius: var(--radius); padding: 9px 14px; cursor: pointer;
+    transition: background .25s, color .25s;
+  }
+  .toys button:hover { background: var(--accent); color: var(--bg); }
+  .toys button:disabled { opacity: .5; cursor: default; }
+  .toys button.mini { font-size: .75rem; padding: 6px 12px; opacity: .7; border-style: dashed; }
+  /* kolorowe plamy po rozmagnesowaniu */
+  #glow {
+    position: fixed; inset: -20%; pointer-events: none; z-index: 60; opacity: 0; mix-blend-mode: screen;
+    background:
+      radial-gradient(40% 35% at 20% 30%, rgba(255,0,80,.75), transparent 70%),
+      radial-gradient(35% 40% at 80% 25%, rgba(0,255,120,.65), transparent 70%),
+      radial-gradient(45% 40% at 60% 80%, rgba(40,80,255,.75), transparent 70%),
+      radial-gradient(30% 30% at 15% 85%, rgba(255,230,0,.55), transparent 70%);
+  }
 </style>
 </head>
 <body>
@@ -122,6 +148,19 @@
 </div>
 </main>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="degauss" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+    <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r"/>
+    <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g"/>
+    <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b"/>
+    <feOffset id="degR" in="r" dx="0" dy="0" result="r2"/>
+    <feOffset id="degB" in="b" dx="0" dy="0" result="b2"/>
+    <feBlend in="r2" in2="g" mode="screen" result="rg"/>
+    <feBlend in="rg" in2="b2" mode="screen"/>
+  </filter>
+</svg>
+<div id="glow"></div>
+<aside class="toys" id="toys" aria-label="Zabawki"><p class="toys-title">Zabawki</p></aside>
 <script>
 /* ============ EDYTUJ TUTAJ ============
    img: własny screen (np. "img/space.png"); puste + live:true = automatyczny screen strony (thum.io); inaczej placeholder
@@ -246,6 +285,76 @@ PROJECTS.forEach(p => {
   a.addEventListener('focus', on);       a.addEventListener('blur', off);
   grid.appendChild(a);
 });
+
+/* ===== ZABAWKI (prawy panel). Nowa zabawka = nowy obiekt w TOYS: { label, run } ===== */
+const stage = document.querySelector('main');
+const glow = document.getElementById('glow');
+const toysBox = document.getElementById('toys');
+let soundOn = true, audioCtx = null;
+
+function degaussSound() {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = audioCtx; if (ctx.state === 'suspended') ctx.resume();
+    const t = ctx.currentTime;
+    const out = ctx.createGain();
+    out.gain.setValueAtTime(0.0001, t);
+    out.gain.exponentialRampToValueAtTime(0.3, t + 0.02);
+    out.gain.exponentialRampToValueAtTime(0.0001, t + 2.0);
+    out.connect(ctx.destination);
+    const am = ctx.createGain(); am.gain.value = 0.6; am.connect(out);
+    const lfo = ctx.createOscillator(), lg = ctx.createGain();
+    lfo.frequency.setValueAtTime(30, t); lfo.frequency.exponentialRampToValueAtTime(5, t + 1.8);
+    lg.gain.value = 0.4; lfo.connect(lg); lg.connect(am.gain);
+    const o = ctx.createOscillator(); o.type = 'sine';
+    o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(46, t + 1.8);
+    o.connect(am);
+    [o, lfo].forEach(n => { n.start(t); n.stop(t + 2.1); });
+  } catch (e) {}
+}
+
+// Rozmagnesowanie kineskopu: gasnące drgania, rozszczepienie RGB, zmiana barw i kolorowe plamy
+function degauss() {
+  return new Promise(done => {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const dur = reduced ? 900 : 2200;
+    const dR = document.getElementById('degR'), dB = document.getElementById('degB');
+    if (soundOn) degaussSound();
+    const t0 = performance.now();
+    (function frame(now) {
+      const p = Math.min((now - t0) / dur, 1), a = Math.pow(1 - p, 2.2), s = (now - t0) / 1000;
+      if (!reduced) {
+        const dx = a * 16 * Math.sin(s * 38), dy = a * 7 * Math.sin(s * 47 + 1);
+        stage.style.transform = `translate(${dx}px,${dy}px) skewX(${a * 2.4 * Math.sin(s * 29)}deg) scaleX(${1 + a * 0.035 * Math.sin(s * 23)})`;
+        const split = a * 12 * Math.sin(s * 33);
+        dR.setAttribute('dx', split); dR.setAttribute('dy', a * 3 * Math.sin(s * 41)); dB.setAttribute('dx', -split);
+        stage.style.filter = `url(#degauss) hue-rotate(${a * 200 * Math.sin(s * 14)}deg) saturate(${1 + a * 1.6}) brightness(${1 + a * 0.25 * Math.sin(s * 57)})`;
+      }
+      glow.style.opacity = a * (reduced ? 0.3 : 0.85);
+      glow.style.transform = `rotate(${s * 35}deg) scale(1.3)`;
+      if (p < 1) requestAnimationFrame(frame);
+      else {
+        stage.style.transform = ''; stage.style.filter = ''; glow.style.opacity = 0;
+        dR.setAttribute('dx', 0); dR.setAttribute('dy', 0); dB.setAttribute('dx', 0);
+        done();
+      }
+    })(t0);
+  });
+}
+
+const TOYS = [
+  { label: '📺 Rozmagnesuj kineskop', run: degauss }
+];
+TOYS.forEach(toy => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.textContent = toy.label;
+  b.addEventListener('click', async () => { b.disabled = true; await toy.run(); b.disabled = false; });
+  toysBox.appendChild(b);
+});
+const snd = document.createElement('button');
+snd.type = 'button'; snd.className = 'mini'; snd.textContent = '🔊 Dźwięk: wł.';
+snd.addEventListener('click', () => { soundOn = !soundOn; snd.textContent = soundOn ? '🔊 Dźwięk: wł.' : '🔇 Dźwięk: wył.'; });
+toysBox.appendChild(snd);
 </script>
 </body>
 </html>
