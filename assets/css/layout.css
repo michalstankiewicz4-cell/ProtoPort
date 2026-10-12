@@ -1,0 +1,61 @@
+/* ==========================================================================
+   layout.css — szkielet strony: stały nagłówek + przewijana lista projektów
+   ========================================================================== */
+
+html, body { height: 100%; overflow: hidden; }
+
+main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Nagłówek ma stałą czcionkę i układ, żeby nie skakał przy zmianie motywu
+   (zmieniają się w nim tylko kolory). */
+header {
+  flex: none;
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 40px 0 24px;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+header > div { flex: 1 1 160px; min-width: 0; }
+
+/* Przewijana część, pasek przewijania ukryty */
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 28px 0 64px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+h2 { font-size: 1.4rem; margin-bottom: 24px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 28px;
+}
+
+footer { margin-top: 80px; opacity: .5; font-size: .85rem; }
+
+@media (max-width: 600px) {
+  header { gap: 16px; padding: 16px 0 14px; }
+}
+
+/* Niskie okno (np. telefon w poziomie): przewija się cała strona */
+@media (max-height: 520px) {
+  html, body { overflow: auto; }
+  main { height: auto; display: block; }
+  .scroll { overflow: visible; }
+}

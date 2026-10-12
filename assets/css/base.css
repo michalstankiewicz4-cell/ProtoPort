@@ -1,0 +1,60 @@
+/* ==========================================================================
+   base.css — zmienne motywu, reset i typografia
+   ========================================================================== */
+
+/* Rejestracja zmiennych pozwala przeglądarce płynnie animować kolory i zaokrąglenia */
+@property --bg     { syntax: '<color>';  inherits: true; initial-value: #101114; }
+@property --fg     { syntax: '<color>';  inherits: true; initial-value: #e8e8ea; }
+@property --accent { syntax: '<color>';  inherits: true; initial-value: #7c9cff; }
+@property --card   { syntax: '<color>';  inherits: true; initial-value: #1a1c21; }
+@property --radius { syntax: '<length>'; inherits: true; initial-value: 14px; }
+
+:root {
+  --bg: #101114;
+  --fg: #e8e8ea;
+  --accent: #7c9cff;
+  --card: #1a1c21;
+  --radius: 14px;
+  --font: 'Inter', system-ui, sans-serif;
+  --head-spacing: 0em;
+  --head-transform: none;
+  transition:
+    --bg 1.4s ease, --fg 1.4s ease, --accent 1.4s ease,
+    --card 1.4s ease, --radius 1.4s ease;
+}
+
+* { box-sizing: border-box; margin: 0; }
+
+/* Nie da się zaznaczyć tekstu ani elementów (prawy przycisk myszy działa normalnie) */
+*, *::before, *::after {
+  -webkit-user-select: none;
+  user-select: none;
+}
+html { -webkit-tap-highlight-color: transparent; }
+img { -webkit-user-drag: none; user-drag: none; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Nakładka-efekt (np. scanlines) pojawia się płynnie */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+  background: var(--overlay, none);
+}
+body.fx::after { opacity: .35; }
+
+h1, h2 {
+  letter-spacing: var(--head-spacing);
+  text-transform: var(--head-transform);
+  line-height: 1.15;
+}

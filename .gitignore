@@ -1,0 +1,13 @@
+# System
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Edytory
+.vscode/
+.idea/
+
+# Zależności i artefakty
+node_modules/
+*.log
+*.zip

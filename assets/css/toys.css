@@ -1,0 +1,55 @@
+/* ==========================================================================
+   toys.css — prawy panel zabawek (position: fixed, nie rusza środkowej kolumny)
+   ========================================================================== */
+
+.toys {
+  position: fixed;
+  top: 40px;
+  left: calc(50% + 490px + 24px);
+  width: min(220px, calc(50vw - 490px - 48px));
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 5;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+/* Panel pokazujemy tylko, gdy po prawej jest wystarczająco miejsca */
+@media (min-width: 1400px) { .toys { display: flex; } }
+
+.toys-title {
+  margin: 0 0 2px;
+  font-size: .72rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  opacity: .55;
+}
+.toys button {
+  font: inherit;
+  font-size: .9rem;
+  text-align: left;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 9px 14px;
+  cursor: pointer;
+  transition: background .25s, color .25s;
+}
+.toys button:hover { background: var(--accent); color: var(--bg); }
+.toys button:disabled { opacity: .5; cursor: default; }
+.toys button.mini { font-size: .75rem; padding: 6px 12px; opacity: .7; border-style: dashed; }
+
+/* Kolorowe plamy po rozmagnesowaniu kineskopu */
+.degauss-glow {
+  position: fixed;
+  inset: -20%;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(40% 35% at 20% 30%, rgba(255, 0, 80, .75), transparent 70%),
+    radial-gradient(35% 40% at 80% 25%, rgba(0, 255, 120, .65), transparent 70%),
+    radial-gradient(45% 40% at 60% 80%, rgba(40, 80, 255, .75), transparent 70%),
+    radial-gradient(30% 30% at 15% 85%, rgba(255, 230, 0, .55), transparent 70%);
+}

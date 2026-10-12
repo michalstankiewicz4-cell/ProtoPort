@@ -1,360 +1,122 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Michał — vibecoder</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&family=Cinzel:wght@500;800&family=Fredoka:wght@400;600&family=Orbitron:wght@500;800&family=Caveat:wght@500;700&family=Special+Elite&family=Antonio:wght@400;700&display=swap" rel="stylesheet">
-<style>
-  /* Rejestracja zmiennych, dzięki temu przeglądarka płynnie animuje kolory i zaokrąglenia */
-  @property --bg     { syntax: '<color>';  inherits: true; initial-value: #101114; }
-  @property --fg     { syntax: '<color>';  inherits: true; initial-value: #e8e8ea; }
-  @property --accent { syntax: '<color>';  inherits: true; initial-value: #7c9cff; }
-  @property --card   { syntax: '<color>';  inherits: true; initial-value: #1a1c21; }
-  @property --radius { syntax: '<length>'; inherits: true; initial-value: 14px; }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  :root {
-    --bg:#101114; --fg:#e8e8ea; --accent:#7c9cff; --card:#1a1c21; --radius:14px;
-    --font:'Inter',system-ui,sans-serif;
-    --head-spacing:0em; --head-transform:none;
-    transition: --bg 1.4s ease, --fg 1.4s ease, --accent 1.4s ease, --card 1.4s ease, --radius 1.4s ease;
-  }
-  * { box-sizing: border-box; margin: 0; }
-  body {
-    background: var(--bg); color: var(--fg); font-family: var(--font);
-    line-height: 1.6; min-height: 100vh;
-  }
-  /* nakładka-efekt (scanlines / ziarno) pojawia się płynnie */
-  body::after {
-    content:''; position: fixed; inset: 0; pointer-events: none; opacity: 0;
-    transition: opacity 1.4s ease; background: var(--overlay, none);
-  }
-  body.fx::after { opacity: .35; }
+  <!-- SEO -->
+  <title>Michał — vibecoder | prototypy, gry i aplikacje webowe</title>
+  <meta name="description" content="Portfolio Michała, vibecodera: szybkie MVP, prototypy aplikacji webowych i gier 2D/3D, narzędzia AI i dashboardy. Zobacz projekty działające w przeglądarce.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="theme-color" content="#101114">
+  <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/ProtoPort/">
 
-  html, body { height: 100%; overflow: hidden; }
-  main { max-width: 980px; margin: 0 auto; padding: 0 24px; height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
+  <!-- Open Graph (Facebook, Messenger, LinkedIn...) -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pl_PL">
+  <meta property="og:site_name" content="Michał — vibecoder">
+  <meta property="og:title" content="Michał — vibecoder | prototypy, gry i aplikacje webowe">
+  <meta property="og:description" content="Szybkie MVP, prototypy aplikacji i gier w przeglądarce. Zobacz projekty — po najechaniu cała strona zmienia styl.">
+  <meta property="og:url" content="https://michalstankiewicz4-cell.github.io/ProtoPort/">
+  <meta property="og:image" content="https://michalstankiewicz4-cell.github.io/ProtoPort/assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Michał — vibecoder: zdjęcie i miniatury projektów">
 
-  header { flex: none; display: flex; gap: 32px; align-items: center; flex-wrap: wrap; padding: 40px 0 24px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); }
-  .scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 28px 0 64px; scrollbar-width: none; -ms-overflow-style: none; }
-  .scroll::-webkit-scrollbar { display: none; }
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Michał — vibecoder | prototypy, gry i aplikacje webowe">
+  <meta name="twitter:description" content="Szybkie MVP, prototypy aplikacji i gier w przeglądarce.">
+  <meta name="twitter:image" content="https://michalstankiewicz4-cell.github.io/ProtoPort/assets/img/og-image.png">
 
-  .photo {
-    width: 180px; height: 180px; border-radius: 50%; object-fit: cover; flex: none;
-    border: 3px solid var(--accent); transition: border-color 1.4s ease, border-radius 1.4s ease;
-    background: var(--card);
-  }
-  body.themed .photo { border-radius: var(--radius); }
-  h1, h2 { letter-spacing: var(--head-spacing); text-transform: var(--head-transform); line-height: 1.15; }
-  h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; }
-  h1 span { color: var(--accent); transition: color 1.4s ease; }
-  .intro { max-width: 560px; margin-top: 12px; opacity: .85; }
-  .links { margin-top: 18px; display: flex; gap: 14px; flex-wrap: wrap; justify-content: space-between; }
-  .links a {
-    color: var(--fg); text-decoration: none; padding: 8px 16px;
-    border: 1px solid var(--accent); border-radius: var(--radius);
-    transition: background .25s, color .25s;
-  }
-  .links a:hover { background: var(--accent); color: var(--bg); }
+  <!-- Ikony -->
+  <link rel="icon" href="assets/img/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/img/icons/favicon.ico" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/img/icons/apple-touch-icon.png">
 
-  h2 { font-size: 1.4rem; margin-bottom: 24px; }
-  /* nagłówek ma stałą czcionkę i układ, żeby nie skakał przy zmianie motywu (zmieniają się tylko kolory) */
-  header { font-family: 'Inter', system-ui, sans-serif; }
-  header h1 { letter-spacing: 0; text-transform: none; }
-  header > div { flex: 1 1 160px; min-width: 0; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 28px; }
+  <!-- Dane strukturalne -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://michalstankiewicz4-cell.github.io/ProtoPort/#website",
+        "url": "https://michalstankiewicz4-cell.github.io/ProtoPort/",
+        "name": "Michał — vibecoder",
+        "inLanguage": "pl-PL"
+      },
+      {
+        "@type": "Person",
+        "@id": "https://michalstankiewicz4-cell.github.io/ProtoPort/#person",
+        "name": "Michał",
+        "jobTitle": "Vibecoder",
+        "url": "https://michalstankiewicz4-cell.github.io/ProtoPort/",
+        "image": "https://michalstankiewicz4-cell.github.io/ProtoPort/assets/img/photo.jpg",
+        "sameAs": ["https://github.com/michalstankiewicz4-cell"],
+        "knowsAbout": ["prototypowanie aplikacji", "gry przeglądarkowe", "aplikacje webowe", "narzędzia AI"]
+      }
+    ]
+  }
+  </script>
 
-  .project {
-    display: block; text-decoration: none; color: inherit; background: var(--card);
-    border-radius: var(--radius); overflow: hidden; border: 1px solid transparent;
-    transition: transform .35s ease, border-color .35s ease, box-shadow .35s ease;
-  }
-  .project:hover, .project:focus-visible {
-    transform: translateY(-6px); border-color: var(--accent);
-    box-shadow: 0 12px 40px -12px var(--accent); outline: none;
-  }
-  .shot { aspect-ratio: 16/10; width: 100%; display: block; object-fit: cover; background: #000; }
-  .info { padding: 16px 18px 20px; }
-  .info h3 { font-size: 1.1rem; margin-bottom: 4px; }
-  .info p { font-size: .9rem; opacity: .75; }
-  .tag { display: inline-block; margin-top: 10px; font-size: .75rem; color: var(--accent); }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Share+Tech+Mono&family=Cinzel:wght@500;800&family=Fredoka:wght@400;600&family=Orbitron:wght@500;800&family=Caveat:wght@500;700&family=Special+Elite&family=Antonio:wght@400;700&display=swap">
 
-  footer { margin-top: 80px; opacity: .5; font-size: .85rem; }
-  @media (max-width: 600px) {
-    header { gap: 16px; padding: 16px 0 14px; }
-    .photo { width: 84px; height: 84px; }
-    h1 { font-size: 1.5rem; }
-    .intro { font-size: .85rem; margin-top: 6px; }
-    .links { margin-top: 10px; }
-  }
-  @media (max-height: 520px) {
-    html, body { overflow: auto; }
-    main { height: auto; display: block; }
-    .scroll { overflow: visible; }
-  }
-  /* ===== prawy panel zabawek: position:fixed, więc nie rusza środkowej kolumny ===== */
-  .toys {
-    position: fixed; top: 40px; left: calc(50% + 490px + 24px);
-    width: min(220px, calc(50vw - 490px - 48px));
-    display: none; flex-direction: column; gap: 10px; z-index: 5;
-    font-family: 'Inter', system-ui, sans-serif;
-  }
-  @media (min-width: 1400px) { .toys { display: flex; } }
-  .toys-title { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; opacity: .55; margin: 0 0 2px; }
-  .toys button {
-    font: inherit; font-size: .9rem; color: var(--fg); background: transparent; text-align: left;
-    border: 1px solid var(--accent); border-radius: var(--radius); padding: 9px 14px; cursor: pointer;
-    transition: background .25s, color .25s;
-  }
-  .toys button:hover { background: var(--accent); color: var(--bg); }
-  .toys button:disabled { opacity: .5; cursor: default; }
-  .toys button.mini { font-size: .75rem; padding: 6px 12px; opacity: .7; border-style: dashed; }
-  /* kolorowe plamy po rozmagnesowaniu */
-  #glow {
-    position: fixed; inset: -20%; pointer-events: none; z-index: 60; opacity: 0; mix-blend-mode: screen;
-    background:
-      radial-gradient(40% 35% at 20% 30%, rgba(255,0,80,.75), transparent 70%),
-      radial-gradient(35% 40% at 80% 25%, rgba(0,255,120,.65), transparent 70%),
-      radial-gradient(45% 40% at 60% 80%, rgba(40,80,255,.75), transparent 70%),
-      radial-gradient(30% 30% at 15% 85%, rgba(255,230,0,.55), transparent 70%);
-  }
-</style>
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/toys.css">
 </head>
 <body>
-<main>
-  <header>
-    <!-- Podmień photo.jpg na swoje zdjęcie (wrzuć plik obok index.html) -->
-    <img class="photo" src="photo.jpg" alt="Moje zdjęcie"
-         onerror="this.removeAttribute('src');this.style.background='var(--card)'">
-    <div>
-      <h1>Cześć, jestem <span>Michał</span></h1>
-      <p class="intro">
-        Vibecoder. Szybko buduję MVP, prototypy aplikacji i gry — zamiast tygodni planowania
-        wolę zobaczyć pomysł działający na ekranie. Robię to hobbystycznie, dla siebie.
-      </p>
-      <nav class="links">
-        <a href="https://github.com/michalstankiewicz4-cell">GitHub</a>
-        <a href="tel:+48797486355">+48 797 486 355</a>
-      </nav>
+  <main>
+    <header>
+      <img class="photo" src="assets/img/photo.jpg" width="180" height="180" alt="Zdjęcie Michała" fetchpriority="high">
+      <div>
+        <h1>Cześć, jestem <span>Michał</span></h1>
+        <p class="intro">
+          Vibecoder. Szybko buduję MVP, prototypy aplikacji i gry — zamiast tygodni planowania
+          wolę zobaczyć pomysł działający na ekranie. Robię to hobbystycznie, dla siebie.
+        </p>
+        <nav class="links" aria-label="Kontakt">
+          <a href="https://github.com/michalstankiewicz4-cell">GitHub</a>
+          <div class="contact">
+            <a href="tel:+48797486355">+48 797 486 355</a>
+            <button type="button" class="copy" data-copy="+48 797 486 355" aria-live="polite" aria-label="Skopiuj numer telefonu do schowka">📋 Kopiuj</button>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <div class="scroll">
+      <section>
+        <h2>Moje projekty</h2>
+        <div class="grid" id="grid"></div>
+
+        <!-- Wersja bez JavaScriptu (kafelki rysuje js/projects.js na podstawie js/data/projects.js) -->
+        <noscript>
+          <ul>
+            <li><a href="https://github.com/michalstankiewicz4-cell/IPscanner">Skaner adresów IP</a> — narzędzie do skanowania i audytu adresów IP.</li>
+            <li><a href="https://michalstankiewicz4-cell.github.io/monitoringobywatelski/">Monitoring obywatelski</a> — aplikacja webowa.</li>
+            <li><a href="https://michalstankiewicz4-cell.github.io/PatientZero/">Patient Zero</a> — gra dla dwóch osób: rak kontra lekarz.</li>
+            <li><a href="https://michalstankiewicz4-cell.github.io/Space/">Space</a> — strategia kosmiczna (Swarm Protocol).</li>
+            <li><a href="https://michalstankiewicz4-cell.github.io/CorkBoard/">CorkBoard</a> — cyfrowa tablica korkowa.</li>
+            <li><a href="https://michalstankiewicz4-cell.github.io/NostraDamnOS/">NostraDamnOS</a> — analiza wypowiedzi parlamentarnych.</li>
+            <li><a href="https://michalstankiewicz4-cell.github.io/Hive-Hunger/">Hive Hunger</a> — gra 3D, w której rój pożera planetę.</li>
+            <li><a href="https://michalstankiewicz4-cell.github.io/PetrieDish/">Petrie Dish</a> — symulacja płynów i silnik fizyki.</li>
+          </ul>
+        </noscript>
+      </section>
+
+      <footer>Projekty nie są skończone — to hobby. Najedź na kafelek, żeby zmienić klimat strony.</footer>
     </div>
-  </header>
+  </main>
 
-  <div class="scroll"><section>
-    <h2>Moje projekty</h2>
-    <div class="grid" id="grid"></div>
-  </section>
+  <aside class="toys" id="toys" aria-label="Zabawki">
+    <p class="toys-title">Zabawki</p>
+  </aside>
 
-  <footer>Projekty nie są skończone — to hobby. Najedź na kafelek, żeby zmienić klimat strony.</footer>
-</div>
-</main>
-
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <filter id="degauss" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
-    <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r"/>
-    <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g"/>
-    <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b"/>
-    <feOffset id="degR" in="r" dx="0" dy="0" result="r2"/>
-    <feOffset id="degB" in="b" dx="0" dy="0" result="b2"/>
-    <feBlend in="r2" in2="g" mode="screen" result="rg"/>
-    <feBlend in="rg" in2="b2" mode="screen"/>
-  </filter>
-</svg>
-<div id="glow"></div>
-<aside class="toys" id="toys" aria-label="Zabawki"><p class="toys-title">Zabawki</p></aside>
-<script>
-/* ============ EDYTUJ TUTAJ ============
-   img: własny screen (np. "img/space.png"); puste + live:true = automatyczny screen strony (thum.io); inaczej placeholder
-   theme: kolory + styl, na który strona płynnie się zmienia po najechaniu */
-const PROJECTS = [
-  {
-    title: "Skaner adresów IP",
-    desc: "Narzędzie do skanowania i audytu adresów IP.",
-    tag: "narzędzie • sieci",
-    url: "https://github.com/michalstankiewicz4-cell/IPscanner",
-    img: "img/ipscanner.jpg",
-    theme: { bg:"#1b1b1d", fg:"#d8d8d8", accent:"#1a8cff", card:"#252527", radius:"3px",
-             font:"'Inter', sans-serif", spacing:"0", transform:"none", fx:"" }
-  },
-  {
-    title: "Monitoring obywatelski",
-    desc: "Teczki, dane, wszystko pod obserwacją.",
-    tag: "aplikacja web",
-    url: "https://michalstankiewicz4-cell.github.io/monitoringobywatelski/",
-    img: "img/monitoring.jpg",
-    theme: { bg:"#2a0606", fg:"#f6dede", accent:"#ff1f1f", card:"#400b0b", radius:"0px",
-             font:"'Special Elite', monospace", spacing:"0.12em", transform:"uppercase", fx:"scan" }
-  },
-  {
-    title: "Patient Zero",
-    desc: "Rak kontra lekarz: gra dla dwóch osób w jednym oknie.",
-    tag: "gra • 2 graczy",
-    url: "https://michalstankiewicz4-cell.github.io/PatientZero/",
-    img: "img/patientzero.jpg",
-    theme: { bg:"#111c20", fg:"#e6f2ee", accent:"#3ddc97", card:"#1a2a30", radius:"14px",
-             font:"'Inter', sans-serif", spacing:"0", transform:"none", fx:"" }
-  },
-  {
-    title: "Space",
-    desc: "Swarm Protocol: strategia kosmiczna z flotą i badaniami.",
-    tag: "gra • strategia",
-    url: "https://michalstankiewicz4-cell.github.io/Space/",
-    img: "img/space.jpg",
-    theme: { bg:"#02030c", fg:"#e8ecff", accent:"#f4b04a", card:"#0b1236", radius:"24px",
-             font:"'Antonio', sans-serif", spacing:"0.05em", transform:"uppercase", fx:"" }
-  },
-  {
-    title: "CorkBoard",
-    desc: "Cyfrowa tablica korkowa z karteczkami i nićmi.",
-    tag: "narzędzie",
-    url: "https://michalstankiewicz4-cell.github.io/CorkBoard/",
-    img: "img/corkboard.jpg",
-    theme: { bg:"#a8743c", fg:"#2a1a0e", accent:"#d9482b", card:"#f7efdc", radius:"3px",
-             font:"'Caveat', cursive", spacing:"0.01em", transform:"none", fx:"" }
-  },
-  {
-    title: "NostraDamnOS",
-    desc: "Parlament P.I.M.P.: analiza wypowiedzi parlamentarnych.",
-    tag: "analiza danych",
-    url: "https://michalstankiewicz4-cell.github.io/NostraDamnOS/",
-    img: "img/nostradamnos.jpg",
-    theme: { bg:"#f0eff8", fg:"#1f2340", accent:"#0a93b8", card:"#ffffff", radius:"16px",
-             font:"'Inter', sans-serif", spacing:"0", transform:"none", fx:"" }
-  },
-  {
-    title: "Hive Hunger",
-    desc: "Rój pożera planetę blok po bloku.",
-    tag: "gra • 3D",
-    url: "https://michalstankiewicz4-cell.github.io/Hive-Hunger/",
-    img: "img/hivehunger.jpg",
-    theme: { bg:"#070a1a", fg:"#cfe4ff", accent:"#ffd166", card:"#0e1634", radius:"6px",
-             font:"'Share Tech Mono', monospace", spacing:"0.02em", transform:"none", fx:"" }
-  },
-  {
-    title: "Petrie Dish",
-    desc: "Symulacja płynów i silnik fizyki, neonowe cząsteczki.",
-    tag: "symulacja • fizyka",
-    url: "https://michalstankiewicz4-cell.github.io/PetrieDish/",
-    img: "img/petriedish.jpg",
-    theme: { bg:"#04050c", fg:"#e8f6ff", accent:"#19e6ff", card:"#0b1022", radius:"14px",
-             font:"'Orbitron', sans-serif", spacing:"0.06em", transform:"uppercase", fx:"" }
-  }
-];
-/* ====================================== */
-
-const root = document.documentElement, body = document.body, grid = document.getElementById('grid');
-const DEFAULT = {
-  bg:"#101114", fg:"#e8e8ea", accent:"#7c9cff", card:"#1a1c21", radius:"14px",
-  font:"'Inter', system-ui, sans-serif", spacing:"0em", transform:"none", fx:""
-};
-const SCAN = "repeating-linear-gradient(0deg, rgba(0,0,0,.45) 0 1px, transparent 1px 3px)";
-
-function apply(t, themed) {
-  const s = root.style;
-  s.setProperty('--bg', t.bg); s.setProperty('--fg', t.fg);
-  s.setProperty('--accent', t.accent); s.setProperty('--card', t.card);
-  s.setProperty('--radius', t.radius);
-  s.setProperty('--font', t.font);
-  s.setProperty('--head-spacing', t.spacing); s.setProperty('--head-transform', t.transform);
-  s.setProperty('--overlay', t.fx === 'scan' ? SCAN : 'none');
-  body.classList.toggle('fx', t.fx === 'scan');
-  body.classList.toggle('themed', themed);
-}
-
-// placeholder-screen generowany z kolorów motywu (dopóki nie wrzucisz prawdziwego screena)
-function placeholder(p) {
-  const t = p.theme;
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 400'>
-    <rect width='640' height='400' fill='${t.bg}'/>
-    <circle cx='480' cy='140' r='110' fill='${t.accent}' opacity='.25'/>
-    <rect x='60' y='240' width='360' height='18' rx='4' fill='${t.accent}'/>
-    <rect x='60' y='276' width='240' height='12' rx='4' fill='${t.fg}' opacity='.5'/>
-    <text x='60' y='190' font-size='44' fill='${t.fg}' font-family='sans-serif' font-weight='700'>${p.title}</text></svg>`;
-  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
-}
-
-PROJECTS.forEach(p => {
-  const a = document.createElement('a');
-  a.className = 'project'; a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
-  a.innerHTML = `
-    <img class="shot" alt="Screen: ${p.title}" loading="lazy" src="${p.img || (p.live ? 'https://image.thum.io/get/width/800/crop/500/' + p.url : placeholder(p))}">
-    <div class="info"><h3>${p.title}</h3><p>${p.desc}</p><span class="tag">${p.tag} →</span></div>`;
-  a.querySelector('img').onerror = e => { e.target.onerror = null; e.target.src = placeholder(p); };
-  const on  = () => apply(p.theme, true);
-  const off = () => apply(DEFAULT, false);
-  a.addEventListener('mouseenter', on);  a.addEventListener('mouseleave', off);
-  a.addEventListener('focus', on);       a.addEventListener('blur', off);
-  grid.appendChild(a);
-});
-
-/* ===== ZABAWKI (prawy panel). Nowa zabawka = nowy obiekt w TOYS: { label, run } ===== */
-const stage = document.querySelector('main');
-const glow = document.getElementById('glow');
-const toysBox = document.getElementById('toys');
-let soundOn = true, audioCtx = null;
-
-function degaussSound() {
-  try {
-    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-    const ctx = audioCtx; if (ctx.state === 'suspended') ctx.resume();
-    const t = ctx.currentTime;
-    const out = ctx.createGain();
-    out.gain.setValueAtTime(0.0001, t);
-    out.gain.exponentialRampToValueAtTime(0.3, t + 0.02);
-    out.gain.exponentialRampToValueAtTime(0.0001, t + 2.0);
-    out.connect(ctx.destination);
-    const am = ctx.createGain(); am.gain.value = 0.6; am.connect(out);
-    const lfo = ctx.createOscillator(), lg = ctx.createGain();
-    lfo.frequency.setValueAtTime(30, t); lfo.frequency.exponentialRampToValueAtTime(5, t + 1.8);
-    lg.gain.value = 0.4; lfo.connect(lg); lg.connect(am.gain);
-    const o = ctx.createOscillator(); o.type = 'sine';
-    o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(46, t + 1.8);
-    o.connect(am);
-    [o, lfo].forEach(n => { n.start(t); n.stop(t + 2.1); });
-  } catch (e) {}
-}
-
-// Rozmagnesowanie kineskopu: gasnące drgania, rozszczepienie RGB, zmiana barw i kolorowe plamy
-function degauss() {
-  return new Promise(done => {
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const dur = reduced ? 900 : 2200;
-    const dR = document.getElementById('degR'), dB = document.getElementById('degB');
-    if (soundOn) degaussSound();
-    const t0 = performance.now();
-    (function frame(now) {
-      const p = Math.min((now - t0) / dur, 1), a = Math.pow(1 - p, 2.2), s = (now - t0) / 1000;
-      if (!reduced) {
-        const dx = a * 16 * Math.sin(s * 38), dy = a * 7 * Math.sin(s * 47 + 1);
-        stage.style.transform = `translate(${dx}px,${dy}px) skewX(${a * 2.4 * Math.sin(s * 29)}deg) scaleX(${1 + a * 0.035 * Math.sin(s * 23)})`;
-        const split = a * 12 * Math.sin(s * 33);
-        dR.setAttribute('dx', split); dR.setAttribute('dy', a * 3 * Math.sin(s * 41)); dB.setAttribute('dx', -split);
-        stage.style.filter = `url(#degauss) hue-rotate(${a * 200 * Math.sin(s * 14)}deg) saturate(${1 + a * 1.6}) brightness(${1 + a * 0.25 * Math.sin(s * 57)})`;
-      }
-      glow.style.opacity = a * (reduced ? 0.3 : 0.85);
-      glow.style.transform = `rotate(${s * 35}deg) scale(1.3)`;
-      if (p < 1) requestAnimationFrame(frame);
-      else {
-        stage.style.transform = ''; stage.style.filter = ''; glow.style.opacity = 0;
-        dR.setAttribute('dx', 0); dR.setAttribute('dy', 0); dB.setAttribute('dx', 0);
-        done();
-      }
-    })(t0);
-  });
-}
-
-const TOYS = [
-  { label: '📺 Rozmagnesuj kineskop', run: degauss }
-];
-TOYS.forEach(toy => {
-  const b = document.createElement('button');
-  b.type = 'button'; b.textContent = toy.label;
-  b.addEventListener('click', async () => { b.disabled = true; await toy.run(); b.disabled = false; });
-  toysBox.appendChild(b);
-});
-const snd = document.createElement('button');
-snd.type = 'button'; snd.className = 'mini'; snd.textContent = '🔊 Dźwięk: wł.';
-snd.addEventListener('click', () => { soundOn = !soundOn; snd.textContent = soundOn ? '🔊 Dźwięk: wł.' : '🔇 Dźwięk: wył.'; });
-toysBox.appendChild(snd);
-</script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
