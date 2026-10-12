@@ -29,10 +29,10 @@ export function initCopyButtons() {
       clearTimeout(timer);
       try {
         await copyText(button.dataset.copy);
-        button.textContent = '✓ Skopiowano';
+        button.textContent = '✓';
         button.classList.add('is-done');
       } catch {
-        button.textContent = 'Nie udało się';
+        button.textContent = '✕';
       }
       timer = setTimeout(() => {
         button.textContent = label;

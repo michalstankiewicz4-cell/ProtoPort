@@ -46,7 +46,7 @@ header h1 { letter-spacing: 0; text-transform: none; }
 
 /* Numer telefonu + przycisk kopiowania do schowka */
 .contact { display: flex; gap: 10px; flex-wrap: wrap; }
-.copy { min-width: 9.5em; text-align: center; }
+.copy { min-width: 3em; text-align: center; }
 
 /* ----- Kafelek projektu ----- */
 .project {
