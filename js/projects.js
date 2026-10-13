@@ -1,5 +1,10 @@
 import { applyTheme, DEFAULT_THEME } from './theme.js';
 
+/** Żywe miniatury ładowane na żądanie (klucz = pole `liveThumb` w js/data/projects.js). */
+const LIVE_THUMBS = {
+  eye: () => import('./thumbs/eye.js'),
+};
+
 /** Placeholder-screen generowany z kolorów motywu (gdy brakuje prawdziwego screena). */
 function placeholder({ title, theme: t }) {
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 400'>
@@ -11,19 +16,31 @@ function placeholder({ title, theme: t }) {
   return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
 }
 
-function createCard(project) {
-  const link = document.createElement('a');
-  link.className = 'project';
-  link.href = project.url;
-  link.target = '_blank';
-  link.rel = 'noopener';
-
+/** Miniatura: zwykły screen, a dla projektów z `liveThumb` — żywa wersja nad screenem. */
+function createShot(project) {
   const shot = new Image();
   shot.className = 'shot';
   shot.alt = `Zrzut ekranu projektu ${project.title}`;
   shot.loading = 'lazy';
   shot.addEventListener('error', () => { shot.src = placeholder(project); }, { once: true });
   shot.src = project.img || placeholder(project);
+
+  const loadLive = LIVE_THUMBS[project.liveThumb];
+  if (!loadLive) return shot;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'shot-wrap';
+  wrap.append(shot);
+  loadLive().then((module) => module.mount(wrap, project)).catch(() => { /* zostaje zwykły screen */ });
+  return wrap;
+}
+
+function createCard(project) {
+  const link = document.createElement('a');
+  link.className = 'project';
+  link.href = project.url;
+  link.target = '_blank';
+  link.rel = 'noopener';
 
   const info = document.createElement('div');
   info.className = 'info';
@@ -36,7 +53,7 @@ function createCard(project) {
   tag.textContent = `${project.tag} →`;
   info.append(title, desc, tag);
 
-  link.append(shot, info);
+  link.append(createShot(project), info);
 
   const on = () => applyTheme(project.theme, true);
   const off = () => applyTheme(DEFAULT_THEME, false);

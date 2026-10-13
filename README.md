@@ -30,6 +30,8 @@ ProtoPort/
 │   ├── copy.js                 # przyciski „kopiuj do schowka"
 │   ├── data/
 │   │   └── projects.js         # LISTA PROJEKTÓW — tu dodajesz nowe
+│   ├── thumbs/
+│   │   └── eye.js              # żywa miniatura: oko podąża za kursorem
 │   └── toys/
 │       ├── index.js            # rejestr zabawek (TOYS) i panel
 │       ├── degauss.js          # rozmagnesowanie kineskopu CRT

@@ -3,6 +3,7 @@
  *
  * Aby dodać projekt: dopisz obiekt poniżej i wrzuć screen do assets/img/projects/.
  *   img    — ścieżka do screena (puste = automatyczny placeholder z kolorów motywu)
+ *   liveThumb — opcjonalnie: nazwa żywej miniatury z js/thumbs/ (np. 'eye'); img zostaje jako wersja awaryjna
  *   theme  — kolory i styl, na które strona płynnie się zmienia po najechaniu na kafelek
  *            (fx: "scan" włącza efekt scanlines)
  */
@@ -24,6 +25,7 @@ export const PROJECTS = [
     tag: 'aplikacja web',
     url: 'https://michalstankiewicz4-cell.github.io/monitoringobywatelski/',
     img: 'assets/img/projects/monitoring.jpg',
+    liveThumb: 'eye',
     theme: {
       bg: '#2a0606', fg: '#f6dede', accent: '#ff1f1f', card: '#400b0b', radius: '0px',
       font: "'Special Elite', monospace", spacing: '0.12em', transform: 'uppercase', fx: 'scan',
