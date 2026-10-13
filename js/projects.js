@@ -97,6 +97,7 @@ function createCard(project) {
     link.addEventListener('mouseleave', fxOff);
     link.addEventListener('focus', fxOn);
     link.addEventListener('blur', fxOff);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) fxOff(); });   // karta w tle: efekt się zatrzymuje
   }
 
   return link;

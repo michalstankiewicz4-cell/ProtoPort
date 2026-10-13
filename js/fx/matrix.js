@@ -2,6 +2,8 @@
    wszystko jednobarwne, jasnozielone, czcionką monospace, obrazy zielono-czarne, na tle spada deszcz znaków
    z "Matrixa" (katakana, cyfry, hex). Zmieniają się tylko style (klasa na body), treść i klikalność zostają. */
 
+import { adaptiveQuality } from './quality.js';
+
 const GREEN = '#8dff8d';
 const GLYPHS = 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾅﾆﾇﾈﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789ABCDEF:.=*+-<>¦';
 const CFG = { size: 16, fade: 1200, speed: [9, 24], trail: 0.055, headChance: 0.975 };
@@ -57,18 +59,23 @@ function create() {
   addEventListener('resize', resize);
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let running = false, raf = 0, hideTimer = 0, last = 0;
+  let running = false, raf = 0, hideTimer = 0, last = 0, active = -1;
+  // jakość dopasowana do klatek/s (js/fx/quality.js): mniej kolumn deszczu przy słabszej wydajności
+  const q = adaptiveQuality({ onLevel: (l) => { active = Math.floor(drops.length * [1, 0.6, 0.4, 0.25][l]); } });
 
   function frame(now) {
     raf = requestAnimationFrame(frame);
-    const dt = Math.min(0.05, (now - last) / 1000);
+    const raw = (now - last) / 1000;
+    const dt = Math.min(0.05, raw);
     last = now;
+    q.tick(raw);
     // smuga: półprzezroczyste czernienie zamiast czyszczenia
     ctx.fillStyle = `rgba(0,0,0,${CFG.trail})`;
     ctx.fillRect(0, 0, W, H);
     ctx.font = `${CFG.size}px "Share Tech Mono", "MS Gothic", "Consolas", monospace`;
     ctx.textBaseline = 'top';
-    for (let k = 0; k < drops.length; k++) {
+    const nD = active < 0 ? drops.length : Math.min(active, drops.length);
+    for (let k = 0; k < nD; k++) {
       const d = drops[k], i = d.x;
       const prev = Math.floor(d.y);
       d.y += d.v * dt * (reduced ? 0 : 1);
@@ -92,6 +99,7 @@ function create() {
       void document.body.offsetWidth;
       document.body.classList.add('mx-on');
       canvas.style.opacity = '1';
+      q.reset();
       if (!running) { running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
     },
     hide() {

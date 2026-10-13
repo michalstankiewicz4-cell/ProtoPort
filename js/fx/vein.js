@@ -5,6 +5,7 @@
    Shadery: js/vendor/patientzero/shaders.js (skopiowane z gry). Three.js r128 ładuje się z CDN przy pierwszym najechaniu. */
 
 import * as SH from '../vendor/patientzero/shaders.js';
+import { adaptiveQuality } from './quality.js';
 
 const THREE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
 
@@ -187,7 +188,7 @@ async function create() {
     uRes: { value: new THREE.Vector2() }, uTime: { value: 0 }, uNear: { value: 0.1 }, uFar: { value: 300 }, uFocus: { value: 17 },
     uFever: { value: 0 }, uHit: { value: 0 }, uFade: { value: 0 }, uSlow: { value: 0 }, uExposure: { value: 0.95 }, uClean: { value: 0 },
   });
-  let T = null, pr = 1;
+  let T = null, pr = 1, resScale = 0.8, doDof = true, doBloom = true, cellFrac = 1;
   const pass = (m, target) => { quad.material = m; renderer.setRenderTarget(target); renderer.render(psc, pcam); };
   const blur = (a, b, scale) => {
     mBlur.uniforms.tIn.value = a.texture; mBlur.uniforms.uDir.value.set(scale / a.width, 0); pass(mBlur, b);
@@ -195,7 +196,7 @@ async function create() {
   };
   function resize() {
     const w = innerWidth, h = innerHeight;
-    pr = Math.min(devicePixelRatio || 1, 1) * 0.8;        // tło — nie potrzeba pełnej rozdzielczości (taniej o ~35%)
+    pr = Math.min(devicePixelRatio || 1, 1) * resScale;   // tło — nie potrzeba pełnej rozdzielczości
     renderer.setPixelRatio(pr); renderer.setSize(w, h, false);
     camera.aspect = w / Math.max(1, h); camera.updateProjectionMatrix();
     const W = Math.floor(w * pr), Hh = Math.floor(h * pr);
@@ -208,16 +209,33 @@ async function create() {
   resize();
   addEventListener('resize', resize);
 
+  // jakość dopasowana do GPU i do klatek/s (js/fx/quality.js): 1 = bez głębi ostrości, 2 = bez bloomu i niższa rozdzielczość, 3 = mniej krwinek
+  function applyLevel(l) {
+    doDof = l < 1; doBloom = l < 2; cellFrac = l >= 3 ? 0.6 : 1; resScale = l >= 2 ? 0.6 : 0.8;
+    mComp.uniforms.uClean.value = doDof ? 0 : 1;
+    resize();                                         // nowe cele renderu są puste (czarne), więc po wyłączeniu bloomu nic nie zostaje na ekranie
+  }
+  const q = adaptiveQuality({ onLevel: applyLevel });
+  try {
+    const gl = renderer.getContext(), ext = gl.getExtension('WEBGL_debug_renderer_info');
+    const gpu = ext ? String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)) : '';
+    if (/intel|mali|adreno|powervr|swiftshader|llvmpipe|software|basic render/i.test(gpu)) q.set(1);   // słabsze / programowe GPU: start bez głębi ostrości
+  } catch (e) { /* bez wykrywania */ }
+
   function post(time, focus) {
     renderer.setRenderTarget(T.scene); renderer.clear(); renderer.render(scene, camera);
-    mBright.uniforms.tIn.value = T.scene.texture; pass(mBright, T.b1a);
-    blur(T.b1a, T.b1b, 1.0);
-    mCopy.uniforms.tIn.value = T.b1a.texture; pass(mCopy, T.b2a);
-    blur(T.b2a, T.b2b, 1.0);
-    mCopy.uniforms.tIn.value = T.b2a.texture; pass(mCopy, T.b3a);
-    blur(T.b3a, T.b3b, 1.0); blur(T.b3a, T.b3b, 2.0);
-    mCopy.uniforms.tIn.value = T.scene.texture; pass(mCopy, T.da);
-    blur(T.da, T.db, 1.2); blur(T.da, T.db, 2.4);
+    if (doBloom) {
+      mBright.uniforms.tIn.value = T.scene.texture; pass(mBright, T.b1a);
+      blur(T.b1a, T.b1b, 1.0);
+      mCopy.uniforms.tIn.value = T.b1a.texture; pass(mCopy, T.b2a);
+      blur(T.b2a, T.b2b, 1.0);
+      mCopy.uniforms.tIn.value = T.b2a.texture; pass(mCopy, T.b3a);
+      blur(T.b3a, T.b3b, 1.0); blur(T.b3a, T.b3b, 2.0);
+    }
+    if (doDof) {
+      mCopy.uniforms.tIn.value = T.scene.texture; pass(mCopy, T.da);
+      blur(T.da, T.db, 1.2); blur(T.da, T.db, 2.4);
+    }
     const u = mComp.uniforms;
     u.tScene.value = T.scene.texture; u.tDepth.value = T.scene.depthTexture; u.tDof.value = T.da.texture;
     u.tB1.value = T.b1a.texture; u.tB2.value = T.b2a.texture; u.tB3.value = T.b3a.texture;
@@ -232,8 +250,10 @@ async function create() {
 
   function frame(now) {
     raf = requestAnimationFrame(frame);
-    const dt = Math.min(0.05, (now - last) / 1000);
+    const raw = (now - last) / 1000;
+    const dt = Math.min(0.05, raw);
     last = now;
+    q.tick(raw);
     if (!reduced) t += dt;
     const phase = (t * BPM / 60) % 1;
     const g = gains(phase), beat = contraction(phase);
@@ -251,7 +271,8 @@ async function create() {
     SHARED.uLight.value.set(camera.position.x + 1.2, camera.position.y + 1.8, camera.position.z * 0.85);
     SHARED.uLightPow.value = 1.5 * (1 + 0.12 * beat);
 
-    for (let i = 0; i < NC; i++) {
+    const nC = Math.floor(NC * cellFrac); rbc.count = nC;
+    for (let i = 0; i < nC; i++) {
       const c = cellS[i];
       c.s += V * (1 - 0.8 * c.tn * c.tn) * dt;
       if (c.s > L) { c.s -= 2 * L; c.tn = rnd(-0.86, 0.86); c.z = rnd(Z0, Z1); }
@@ -296,6 +317,7 @@ async function create() {
     show() {
       clearTimeout(hideTimer);
       canvas.style.opacity = '1';
+      q.reset();
       if (!running) { running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
     },
     hide() {

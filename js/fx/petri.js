@@ -3,6 +3,8 @@
    cząstkami i neonowa poświata. Kursor działa jak wir (jak wciśnięta mysz w Petrie Dish).
    Mechanika uproszczona z oryginału (przestrzeń zapętlona, siatka sąsiedztwa), tylko Canvas 2D. */
 
+import { adaptiveQuality } from './quality.js';
+
 const COLORS = ['#19e6ff', '#ff3df0', '#7dff4f', '#ffd23f', '#8a5cff', '#ff6a2b'];
 const CFG = {
   count: 650, radius: 2.1, range: 64, viscosity: 0.965, force: 0.045, maxSpeed: 3.2,
@@ -52,7 +54,7 @@ function create() {
     cols = Math.ceil(W / R); rows = Math.ceil(H / R);
     if (!head || head.length !== cols * rows) head = new Int32Array(cols * rows);
     head.fill(-1);
-    for (let i = 0; i < N; i++) {
+    for (let i = 0; i < Na; i++) {
       const c = Math.min(cols - 1, Math.max(0, (px[i] / R) | 0));
       const r = Math.min(rows - 1, Math.max(0, (py[i] / R) | 0));
       const k = r * cols + c;
@@ -64,14 +66,16 @@ function create() {
   addEventListener('pointermove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.on = true; });
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let running = false, raf = 0, hideTimer = 0;
+  let running = false, raf = 0, hideTimer = 0, last = 0, Na = N;
+  // jakość dopasowana do klatek/s (js/fx/quality.js): mniej cząstek przy słabszej wydajności
+  const q = adaptiveQuality({ onLevel: (l) => { Na = Math.min(N, [N, 450, 320, 220][l]); } });
 
   const bonds = [];
   function step() {
     buildGrid();
     bonds.length = 0;
     const rSq = R * R, bSq = CFG.bondDist * CFG.bondDist;
-    for (let i = 0; i < N; i++) {
+    for (let i = 0; i < Na; i++) {
       let ax = 0, ay = 0;
       const gc = Math.min(cols - 1, Math.max(0, (px[i] / R) | 0));
       const gr = Math.min(rows - 1, Math.max(0, (py[i] / R) | 0));
@@ -105,7 +109,7 @@ function create() {
         }
       }
     }
-    for (let i = 0; i < N; i++) {
+    for (let i = 0; i < Na; i++) {
       vx[i] *= CFG.viscosity; vy[i] *= CFG.viscosity;
       const v = Math.hypot(vx[i], vy[i]);
       if (v > CFG.maxSpeed) { vx[i] *= CFG.maxSpeed / v; vy[i] *= CFG.maxSpeed / v; }
@@ -148,17 +152,18 @@ function create() {
       ctx.fillStyle = COLORS[s];
       ctx.globalAlpha = 1;                            // poświata: gradient promienisty (sprite)
       const gr = CFG.radius * 6.5;
-      for (let i = s; i < N; i += S) ctx.drawImage(glow[s], px[i] - gr, py[i] - gr, gr * 2, gr * 2);
+      for (let i = s; i < Na; i += S) ctx.drawImage(glow[s], px[i] - gr, py[i] - gr, gr * 2, gr * 2);
       ctx.globalAlpha = 0.95;                         // jądro
       ctx.beginPath();
-      for (let i = s; i < N; i += S) { ctx.moveTo(px[i] + CFG.radius, py[i]); ctx.arc(px[i], py[i], CFG.radius, 0, 6.2832); }
+      for (let i = s; i < Na; i += S) { ctx.moveTo(px[i] + CFG.radius, py[i]); ctx.arc(px[i], py[i], CFG.radius, 0, 6.2832); }
       ctx.fill();
     }
     ctx.globalAlpha = 1;
   }
 
-  function frame() {
+  function frame(now) {
     raf = requestAnimationFrame(frame);
+    q.tick((now - last) / 1000); last = now;
     if (!reduced) step();
     draw();
   }
@@ -167,7 +172,8 @@ function create() {
     show() {
       clearTimeout(hideTimer);
       canvas.style.opacity = '1';
-      if (!running) { running = true; raf = requestAnimationFrame(frame); }
+      q.reset();
+      if (!running) { running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
     },
     hide() {
       canvas.style.opacity = '0';
