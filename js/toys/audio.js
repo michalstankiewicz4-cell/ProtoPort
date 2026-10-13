@@ -1,20 +1,166 @@
-/** Dźwięki zabawek (Web Audio API, bez plików audio) + przełącznik wyciszenia. */
+/** Dźwięki zabawek i efektów (Web Audio API, bez plików audio) + przełącznik wyciszenia "Dźwięk". */
 let enabled = true;
 let ctx = null;
+let bus = null;                       // wspólne wyjście: master -> kompresor -> głośniki
+let noiseBuf = null, brownBuf = null;
 
 export const isSoundEnabled = () => enabled;
 
 export function toggleSound() {
   enabled = !enabled;
+  if (bus) bus.gain.setTargetAtTime(enabled ? 0.9 : 0, ctx.currentTime, 0.05);
   return enabled;
+}
+
+/** Wspólny kontekst audio (tworzony przy pierwszej potrzebie; przeglądarka wznawia go po geście użytkownika). */
+function audio() {
+  if (!ctx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    const comp = ctx.createDynamicsCompressor();
+    bus = ctx.createGain();
+    bus.gain.value = enabled ? 0.9 : 0;
+    bus.connect(comp); comp.connect(ctx.destination);
+    const n = ctx.sampleRate;
+    noiseBuf = ctx.createBuffer(1, n, ctx.sampleRate);
+    brownBuf = ctx.createBuffer(1, n * 2, ctx.sampleRate);
+    const a = noiseBuf.getChannelData(0), b = brownBuf.getChannelData(0);
+    for (let i = 0; i < a.length; i++) a[i] = Math.random() * 2 - 1;
+    let last = 0;
+    for (let i = 0; i < b.length; i++) { last = last * 0.985 + (Math.random() * 2 - 1) * 0.12; b[i] = last; }   // szum "brązowy"
+  }
+  if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+  return ctx;
+}
+for (const ev of ['pointerdown', 'keydown']) addEventListener(ev, () => { if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {}); }, { passive: true });
+
+const env = (g, t, peak, attack, dur) => {
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(peak, t + attack);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+};
+
+/** Niskie "uderzenie" (sinus z opadającą częstotliwością + trochę szumu) — jak w grze Patient Zero. */
+function thump(dest, t, strength, f0, f1, dur, noiseCut = 220) {
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(f0, t);
+  o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  env(g, t, strength, 0.008, dur);
+  o.connect(g); g.connect(dest);
+  o.start(t); o.stop(t + dur + 0.02);
+  const n = ctx.createBufferSource(), nf = ctx.createBiquadFilter(), ng = ctx.createGain();
+  n.buffer = noiseBuf; nf.type = 'lowpass'; nf.frequency.value = noiseCut;
+  env(ng, t, strength * 0.6, 0.006, dur * 0.6);
+  n.connect(nf); nf.connect(ng); ng.connect(dest);
+  n.start(t); n.stop(t + dur);
+}
+
+function noiseLoop(buf, type, freq, q, gain, dest) {
+  const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+  s.buffer = buf; s.loop = true; f.type = type; f.frequency.value = freq; f.Q.value = q; g.gain.value = gain;
+  s.connect(f); f.connect(g); g.connect(dest); s.start();
+  return s;
+}
+
+/* ---------- dźwięki otoczenia: każdy rodzaj ma jedną instancję (licznik odwołań), płynnie wchodzi i wychodzi ---------- */
+const BEAT = 60 / 72;                 // 72 uderzenia na minutę, jak w tle "żyły"
+
+const KINDS = {
+  /** Bicie serca "pod wodą" — ten sam lub/dub i dolnoprzepustowy filtr co w grze, plus szum prądu krwi. */
+  heart(out) {
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 700; lp.Q.value = 0.7;
+    lp.connect(out);
+    const flow = noiseLoop(brownBuf, 'lowpass', 260, 0.7, 0.2, lp);
+    let next = ctx.currentTime + 0.1;
+    const timer = setInterval(() => {
+      while (next < ctx.currentTime + 0.35) {
+        thump(lp, next + 0.13 * BEAT, 0.7, 68, 34, 0.17);      // lub
+        thump(lp, next + 0.45 * BEAT, 0.45, 92, 48, 0.12);     // dub
+        next += BEAT;
+      }
+    }, 120);
+    return () => { clearInterval(timer); flow.stop(ctx.currentTime + 0.6); };
+  },
+  /** Szum starego ekranu: brum 50/100 Hz i cienki pisk cewki odchylania. */
+  hum(out) {
+    const nodes = [];
+    for (const [type, f, v] of [['sawtooth', 50, 0.05], ['sine', 100, 0.04], ['sine', 15734, 0.004]]) {
+      const o = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
+      o.type = type; o.frequency.value = f; g.gain.value = v;
+      lp.type = f > 5000 ? 'allpass' : 'lowpass'; lp.frequency.value = 220;
+      o.connect(lp); lp.connect(g); g.connect(out); o.start(); nodes.push(o);
+    }
+    const hiss = noiseLoop(noiseBuf, 'highpass', 3000, 0.5, 0.004, out);
+    return () => { const t = ctx.currentTime + 0.6; nodes.forEach((o) => o.stop(t)); hiss.stop(t); };
+  },
+  /** Deszcz kodu: cichy szum i losowe krótkie "bipy". */
+  rain(out) {
+    const hiss = noiseLoop(noiseBuf, 'bandpass', 2600, 0.6, 0.03, out);
+    const timer = setInterval(() => {
+      const t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'square'; o.frequency.value = 500 + Math.random() * 1800;
+      env(g, t, 0.012, 0.004, 0.05 + Math.random() * 0.05);
+      o.connect(g); g.connect(out); o.start(t); o.stop(t + 0.12);
+    }, 150);
+    return () => { clearInterval(timer); hiss.stop(ctx.currentTime + 0.6); };
+  },
+  /** Pieczątki: seria głuchych uderzeń w rytmie pojawiania się pieczątek w efekcie archiwum. */
+  stamp(out) {
+    const timers = [];
+    for (let i = 0; i < 7; i++) timers.push(setTimeout(() => thump(out, ctx.currentTime, 0.9, 150, 45, 0.16, 500), (1.2 + i * 0.22) * 1000));
+    return () => timers.forEach(clearTimeout);
+  },
+};
+
+const live = new Map();               // rodzaj -> { n, stop, out }
+
+/** Włącza dźwięk otoczenia; zwraca funkcję go kończącą. Bez audio w przeglądarce nic nie robi. */
+export function ambient(kind) {
+  try {
+    if (!KINDS[kind] || !audio()) return () => {};
+    let inst = live.get(kind);
+    if (!inst) {
+      const out = ctx.createGain();
+      out.gain.setValueAtTime(0.0001, ctx.currentTime);
+      out.gain.setTargetAtTime(kind === 'heart' ? 0.8 : 1, ctx.currentTime, 0.25);
+      out.connect(bus);
+      inst = { n: 0, out, stop: KINDS[kind](out) };
+      live.set(kind, inst);
+    }
+    inst.n++;
+    let done = false;
+    return () => {
+      if (done) return;
+      done = true;
+      if (--inst.n > 0) return;
+      live.delete(kind);
+      inst.out.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.12);
+      setTimeout(() => { inst.stop(); inst.out.disconnect(); }, 700);
+    };
+  } catch { return () => {}; }
+}
+
+/* ---------- krótkie dźwięki zabawek ---------- */
+function blip(f0, f1, dur, type = 'square', vol = 0.12) {
+  if (!enabled || !audio()) return;
+  const t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  env(g, t, vol, 0.005, dur);
+  o.connect(g); g.connect(bus); o.start(t); o.stop(t + dur + 0.02);
+}
+export const playClick = () => blip(1800, 600, 0.05, 'square', 0.1);
+export const playQuack = () => { blip(520, 260, 0.12, 'sawtooth', 0.1); setTimeout(() => blip(480, 230, 0.1, 'sawtooth', 0.08), 130); };
+export function playFanfare() {
+  [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => blip(f, f * 1.01, 0.18, 'square', 0.08), i * 110));
 }
 
 /** Niskie, gasnące buczenie rozmagnesowania kineskopu. */
 export function playDegauss() {
   if (!enabled) return;
   try {
-    ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
-    if (ctx.state === 'suspended') ctx.resume();
+    if (!audio()) return;
     const t = ctx.currentTime;
 
     const out = ctx.createGain();

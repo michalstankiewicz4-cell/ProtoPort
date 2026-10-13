@@ -1,4 +1,8 @@
 import { applyTheme, DEFAULT_THEME } from './theme.js';
+import { ambient } from './toys/audio.js';
+
+/** Dźwięki otoczenia dla efektów (grają tylko przy włączonym przełączniku "Dźwięk"). */
+const AMBIENT = { vein: ['heart'], matrix: ['rain', 'hum'], archive: ['stamp'] };
 
 /** Żywe miniatury ładowane na żądanie (klucz = pole `liveThumb` w js/data/projects.js). */
 const LIVE_THUMBS = {
@@ -6,7 +10,7 @@ const LIVE_THUMBS = {
 };
 
 /** Efekty po najechaniu na kafelek (klucz = pole `hoverFx`); moduł zwraca funkcję start(card) -> stop(). */
-const HOVER_FX = {
+export const HOVER_FX = {
   swarm: () => import('./fx/swarm.js'),
   space: () => import('./fx/space.js'),
   cork: () => import('./fx/cork.js'),
@@ -91,7 +95,12 @@ function createCard(project) {
     const fxOn = async () => {
       const mine = ++ticket;
       const module = await loadFx().catch(() => null);
-      if (module && mine === ticket) { stopFx?.(); stopFx = module.start(link); }
+      if (module && mine === ticket) {
+        stopFx?.();
+        const stop = module.start(link);
+        const sounds = (AMBIENT[project.hoverFx] || []).map(ambient);
+        stopFx = () => { stop(); sounds.forEach((s) => s()); };
+      }
     };
     const fxOff = () => { ticket++; stopFx?.(); stopFx = null; };
     link.addEventListener('mouseenter', fxOn);

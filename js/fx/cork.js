@@ -11,7 +11,7 @@ const SLOW = matchMedia('(prefers-reduced-motion: reduce)').matches ? '0.01s' : 
 const STYLE = `
 .cork-obj { position: relative; transition: transform ${SLOW} cubic-bezier(.2,.8,.2,1), box-shadow ${SLOW} ease, background-color ${SLOW} ease,
   border-color ${SLOW} ease, border-width ${SLOW} ease, border-radius ${SLOW} ease, opacity ${SLOW} ease !important; }
-body.cork-on .cork-obj { transform: rotate(var(--rot, 0deg)); box-shadow: 0 1px 1px rgba(0,0,0,.28), 5px 9px 16px rgba(40,22,5,.45); }
+body.cork-on .cork-obj { transform: rotate(var(--cork-rot, 0deg)); box-shadow: 0 1px 1px rgba(0,0,0,.28), 5px 9px 16px rgba(40,22,5,.45); }
 body.cork-on .project.cork-obj:hover { transform: rotate(0deg) translateY(-8px) scale(1.02); }
 body.cork-on .photo.cork-obj { border: 9px solid #fbf6e8; border-radius: 3px; }
 body.cork-on .cork-paper { background-color: #ffef8a !important; width: fit-content;
@@ -144,7 +144,7 @@ function create() {
 
     objs.forEach((el, i) => {
       const rot = el === photo ? -3.2 : (rand(i, 3) - 0.5) * 4.6;
-      el.style.setProperty('--rot', `${rot.toFixed(2)}deg`);
+      el.style.setProperty('--cork-rot', `${rot.toFixed(2)}deg`);
     });
     for (const el of papers) el.classList.add('cork-paper');
     for (const el of [...toys, ...cards]) el.classList.add('cork-note');
@@ -197,7 +197,7 @@ function create() {
       clearTimeout(hideTimer);
       hideTimer = setTimeout(() => {
         running = false; cancelAnimationFrame(raf);
-        for (const el of objs) { el.classList.remove('cork-obj', 'cork-paper', 'cork-note'); el.style.removeProperty('--rot'); }
+        for (const el of objs) { el.classList.remove('cork-obj', 'cork-paper', 'cork-note'); el.style.removeProperty('--cork-rot'); }
         for (const g of groups) g.replaceChildren();
       }, 1400);
     },

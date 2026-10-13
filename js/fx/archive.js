@@ -11,7 +11,7 @@ const SLOW = matchMedia('(prefers-reduced-motion: reduce)').matches ? '0.01s' : 
 const STYLE = `
 .arc-obj { position: relative; transition: transform ${SLOW} cubic-bezier(.2,.8,.2,1), box-shadow ${SLOW} ease, background-color ${SLOW} ease,
   border-color ${SLOW} ease, border-radius ${SLOW} ease, color ${SLOW} ease, filter ${SLOW} ease, opacity ${SLOW} ease !important; }
-body.arc-on .arc-obj { transform: rotate(var(--rot, 0deg)); box-shadow: 0 1px 1px rgba(0,0,0,.35), 4px 8px 16px rgba(0,0,0,.55); }
+body.arc-on .arc-obj { transform: rotate(var(--arc-rot, 0deg)); box-shadow: 0 1px 1px rgba(0,0,0,.35), 4px 8px 16px rgba(0,0,0,.55); }
 body.arc-on .project.arc-obj:hover { transform: rotate(0deg) translateY(-8px) scale(1.02); }
 body.arc-on .arc-note, body.arc-on .arc-paper { background-color: ${PAPER} !important; border-radius: 2px !important; }
 body.arc-on .arc-paper { width: fit-content; box-shadow: 0 0 0 12px ${PAPER}, 0 1px 1px 12px rgba(0,0,0,.3), 6px 10px 18px 12px rgba(0,0,0,.5); }
@@ -90,7 +90,7 @@ function create() {
 
     objs.forEach((el, i) => {
       const rot = el === photo ? -3 : (rand(i, 3) - 0.5) * 3.4;
-      el.style.setProperty('--rot', `${rot.toFixed(2)}deg`);
+      el.style.setProperty('--arc-rot', `${rot.toFixed(2)}deg`);
       el.classList.add('arc-obj');
     });
     for (const el of papers) el.classList.add('arc-paper');
@@ -135,7 +135,7 @@ function create() {
   }
 
   function cleanup() {
-    for (const el of objs) { el.classList.remove('arc-obj', 'arc-paper', 'arc-note'); el.style.removeProperty('--rot'); }
+    for (const el of objs) { el.classList.remove('arc-obj', 'arc-paper', 'arc-note'); el.style.removeProperty('--arc-rot'); }
     for (const el of added) el.remove();
     objs = []; added = [];
     for (const p of document.querySelectorAll('.project p')) p.style.position = '';
