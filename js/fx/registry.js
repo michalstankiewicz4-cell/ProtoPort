@@ -7,8 +7,8 @@
  *  - ambient: dźwięki otoczenia z js/toys/audio.js.
  */
 export const FX = {
-  swarm: { load: () => import('./swarm.js'), kind: 'canvas' },
-  space: { load: () => import('./space.js'), kind: 'canvas' },
+  swarm: { load: () => import('./swarm.js'), kind: 'canvas', ambient: ['chomp'] },
+  space: { load: () => import('./space.js'), kind: 'canvas', ambient: ['space'] },
   petri: { load: () => import('./petri.js'), kind: 'canvas' },
   vein: { load: () => import('./vein.js'), kind: 'canvas', heavy: true, ambient: ['heart'] },
   cork: { load: () => import('./cork.js'), kind: 'theme' },

@@ -79,8 +79,9 @@ Rejestr `TOYS` w `js/toys/index.js`: `{label, run}` (jednorazowa) albo `{label, 
 - **Konami** (`konami.js`, bez przycisku): ↑↑↓↓←→←→BA → na 7 s efekty `swarm, space, petri, vein` naraz + rozmagnesowanie + fanfara.
   Bierze z rejestru efekty `kind: 'canvas'` (bez `heavy` na słabym GPU); `theme` pomija, bo zmieniają style strony i kolidowałyby.
 - **Dźwięk** (`audio.js`, Web Audio, bez plików): wspólny `AudioContext` + master; `ambient(kind)` z licznikiem odwołań:
-  `heart` (lub/dub z gry, lowpass 700 Hz „pod wodą”, szum krwi), `hum`, `rain`, `stamp`. Pole `ambient` w rejestrze efektów:
-  vein→heart, matrix→rain+hum, archive→stamp. Przeglądarka odblokuje dźwięk dopiero po pierwszym kliknięciu na stronie.
+  `heart` (lub/dub z gry, lowpass 700 Hz „pod wodą”, szum krwi), `hum`, `rain`, `stamp`, `space` (niski dron z „oddychaniem”,
+  szum i dalekie pingi pulsarów), `chomp` (brzęczenie roju + chrupiące gryzienia w nieregularnych odstępach). Pole `ambient` w rejestrze efektów:
+  vein→heart, matrix→rain+hum, archive→stamp, space→space, swarm→chomp. Nowy dźwięk = nowa funkcja w `KINDS` w `audio.js`. Przeglądarka odblokuje dźwięk dopiero po pierwszym kliknięciu na stronie.
 
 ## Pułapki (czego już się nauczyliśmy)
 
@@ -103,8 +104,9 @@ Rejestr `TOYS` w `js/toys/index.js`: `{label, run}` (jednorazowa) albo `{label, 
 
 ## Stan
 
-Wysłane na `main` (ostatni commit: „Zabawki: dźwięki otoczenia, skaner CRT/VHS…”, 6793229): wszystkie 7 efektów hover, adaptacyjna jakość,
-6 zabawek (degauss, CRT/VHS z wypukłością, lampa, kreska, kaczuszka, Konami) i dźwięki otoczenia.
+Na `main`: 7 efektów hover z rejestrem i kontrolerem (`js/fx/`), adaptacyjna jakość, 6 zabawek (degauss, CRT/VHS z wypukłością, lampa,
+kreska, kaczuszka, Konami) i dźwięki otoczenia dla vein, matrix, archive, space i swarm. Screeny projektów w WebP.
+Ostatnie kroki: refaktor (a4c7a45), potem ambient kosmosu i gryzień roju. Aktualną historię pokaże `git log`.
 
 ## Pomysły czekające na decyzję (nie wprowadzać bez prośby)
 

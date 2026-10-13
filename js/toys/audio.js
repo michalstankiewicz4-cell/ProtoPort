@@ -112,6 +112,46 @@ const KINDS = {
     for (let i = 0; i < 7; i++) timers.push(setTimeout(() => thump(out, ctx.currentTime, 0.9, 150, 45, 0.16, 500), (1.2 + i * 0.22) * 1000));
     return () => timers.forEach(clearTimeout);
   },
+  /** Kosmos: niski dron z wolnym "oddychaniem", cichy szum i rzadkie dalekie "pingi" pulsarów. */
+  space(out) {
+    const nodes = [];
+    for (const [f, v] of [[55, 0.07], [82.7, 0.045], [110.4, 0.02]]) {
+      const o = ctx.createOscillator(), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = f; g.gain.value = v;
+      lfo.frequency.value = 0.05 + Math.random() * 0.08; lg.gain.value = v * 0.6;
+      lfo.connect(lg); lg.connect(g.gain);
+      o.connect(g); g.connect(out); o.start(); lfo.start(); nodes.push(o, lfo);
+    }
+    const dust = noiseLoop(brownBuf, 'lowpass', 420, 0.7, 0.07, out);
+    let timer = 0;
+    const ping = () => {
+      const t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = 1400 + Math.random() * 1600;
+      env(g, t, 0.014, 0.01, 1.4);
+      o.connect(g); g.connect(out); o.start(t); o.stop(t + 1.5);
+      timer = setTimeout(ping, 2200 + Math.random() * 4500);
+    };
+    timer = setTimeout(ping, 1200);
+    return () => { clearTimeout(timer); const t = ctx.currentTime + 0.6; nodes.forEach((o) => o.stop(t)); dust.stop(t); };
+  },
+  /** Hive Hunger: brzęczenie roju i chrupiące "gryzienia" w nieregularnych odstępach. */
+  chomp(out) {
+    const buzz = ctx.createOscillator(), bg = ctx.createGain(), bl = ctx.createBiquadFilter(), trem = ctx.createOscillator(), tg = ctx.createGain();
+    buzz.type = 'sawtooth'; buzz.frequency.value = 96; bl.type = 'lowpass'; bl.frequency.value = 320; bg.gain.value = 0.02;
+    trem.frequency.value = 28; tg.gain.value = 0.012; trem.connect(tg); tg.connect(bg.gain);
+    buzz.connect(bl); bl.connect(bg); bg.connect(out); buzz.start(); trem.start();
+    let timer = 0;
+    const bite = () => {
+      const t = ctx.currentTime, n = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+      n.buffer = noiseBuf; f.type = 'bandpass'; f.frequency.value = 900 + Math.random() * 900; f.Q.value = 1.3;
+      env(g, t, 0.16, 0.004, 0.07);
+      n.connect(f); f.connect(g); g.connect(out); n.start(t); n.stop(t + 0.1);
+      thump(out, t, 0.3, 240, 90, 0.07, 1800);
+      timer = setTimeout(bite, Math.random() < 0.3 ? 120 : 320 + Math.random() * 700);
+    };
+    timer = setTimeout(bite, 400);
+    return () => { clearTimeout(timer); const t = ctx.currentTime + 0.6; buzz.stop(t); trem.stop(t); };
+  },
 };
 
 const live = new Map();               // rodzaj -> { n, stop, out }
