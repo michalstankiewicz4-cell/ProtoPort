@@ -9,6 +9,7 @@ const LIVE_THUMBS = {
 const HOVER_FX = {
   swarm: () => import('./fx/swarm.js'),
   space: () => import('./fx/space.js'),
+  cork: () => import('./fx/cork.js'),
 };
 
 /** Placeholder-screen generowany z kolorów motywu (gdy brakuje prawdziwego screena). */

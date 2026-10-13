@@ -60,6 +60,7 @@ export const PROJECTS = [
     tag: 'narzędzie',
     url: 'https://michalstankiewicz4-cell.github.io/CorkBoard/',
     img: 'assets/img/projects/corkboard.jpg',
+    hoverFx: 'cork',
     theme: {
       bg: '#a8743c', fg: '#2a1a0e', accent: '#d9482b', card: '#f7efdc', radius: '3px',
       font: "'Caveat', cursive", spacing: '0.01em', transform: 'none', fx: '',
