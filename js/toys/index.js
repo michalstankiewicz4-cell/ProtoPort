@@ -4,7 +4,7 @@ import { setLamp } from './lamp.js';
 import { setTrail } from './trail.js';
 import { setDuck } from './duck.js';
 import { initKonami } from './konami.js';
-import { isSoundEnabled, toggleSound } from './audio.js';
+import { isSoundEnabled, toggleSound, soundLocked } from './audio.js';
 
 /**
  * Rejestr zabawek z prawego panelu.
@@ -20,7 +20,7 @@ const TOYS = [
   { label: '🦆 Gumowa kaczuszka', states: ['wył.', 'wł.'], set: (i) => setDuck(i === 1) },
 ];
 
-const soundLabel = () => (isSoundEnabled() ? '🔊 Dźwięk: wł.' : '🔇 Dźwięk: wył.');
+const soundLabel = () => (!isSoundEnabled() ? '🔇 Dźwięk: wył.' : soundLocked() ? '🔊 Dźwięk: kliknij stronę, by odblokować' : '🔊 Dźwięk: wł.');
 
 export function initToys(container) {
   for (const toy of TOYS) {
@@ -54,6 +54,7 @@ export function initToys(container) {
     sound.textContent = soundLabel();
   });
   container.append(sound);
+  addEventListener('sound-unlocked', () => { sound.textContent = soundLabel(); });   // pierwszy gest odblokowuje audio
 
   initKonami();
 }

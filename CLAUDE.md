@@ -81,7 +81,7 @@ Rejestr `TOYS` w `js/toys/index.js`: `{label, run}` (jednorazowa) albo `{label, 
 - **Dźwięk** (`audio.js`, Web Audio, bez plików): wspólny `AudioContext` + master; `ambient(kind)` z licznikiem odwołań:
   `heart` (lub/dub z gry, lowpass 700 Hz „pod wodą”, szum krwi), `hum`, `rain`, `stamp`, `space` (niski dron z „oddychaniem”,
   szum i dalekie pingi pulsarów), `chomp` (brzęczenie roju + chrupiące gryzienia w nieregularnych odstępach). Pole `ambient` w rejestrze efektów:
-  vein→heart, matrix→rain+hum, archive→stamp, space→space, swarm→chomp. Nowy dźwięk = nowa funkcja w `KINDS` w `audio.js`. Przeglądarka odblokuje dźwięk dopiero po pierwszym kliknięciu na stronie.
+  vein→heart, matrix→rain+hum, archive→stamp, space→space, swarm→chomp. Nowy dźwięk = nowa funkcja w `KINDS` w `audio.js`. **Dźwięk jest domyślnie wyłączony** (`enabled = false`): przeglądarki blokują audio do pierwszego gestu, więc włącza go dopiero kliknięcie przełącznika „Dźwięk” (to jednocześnie odblokowuje audio).
 
 ## Pułapki (czego już się nauczyliśmy)
 

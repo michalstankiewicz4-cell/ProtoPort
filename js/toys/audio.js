@@ -1,5 +1,5 @@
 /** Dźwięki zabawek i efektów (Web Audio API, bez plików audio) + przełącznik wyciszenia "Dźwięk". */
-let enabled = true;
+let enabled = false;                  // domyślnie wyciszone — dźwięk włącza dopiero kliknięcie przełącznika (to też odblokowuje audio w przeglądarce)
 let ctx = null;
 let bus = null;                       // wspólne wyjście: master -> kompresor -> głośniki
 let noiseBuf = null, brownBuf = null;
@@ -33,7 +33,17 @@ function audio() {
   if (ctx.state === 'suspended') ctx.resume().catch(() => {});
   return ctx;
 }
-for (const ev of ['pointerdown', 'keydown']) addEventListener(ev, () => { if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {}); }, { passive: true });
+/* Przeglądarki odblokowują dźwięk dopiero po geście użytkownika (kliknięcie, klawisz, dotyk) — samo najechanie myszą się nie liczy.
+   Pierwszy taki gest wznawia kontekst i daje znać panelowi zabawek (zdarzenie 'sound-unlocked'). */
+let unlocked = false;
+export const soundLocked = () => !unlocked && !(navigator.userActivation && navigator.userActivation.hasBeenActive);
+function unlock() {
+  if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+  if (unlocked) return;
+  unlocked = true;
+  dispatchEvent(new Event('sound-unlocked'));
+}
+for (const ev of ['pointerdown', 'keydown', 'touchend']) addEventListener(ev, unlock, { passive: true, capture: true });
 
 const env = (g, t, peak, attack, dur) => {
   g.gain.setValueAtTime(0.0001, t);
