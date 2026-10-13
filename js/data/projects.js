@@ -14,6 +14,7 @@ export const PROJECTS = [
     tag: 'narzędzie • sieci',
     url: 'https://github.com/michalstankiewicz4-cell/IPscanner',
     img: 'assets/img/projects/ipscanner.jpg',
+    hoverFx: 'matrix',
     theme: {
       bg: '#1b1b1d', fg: '#d8d8d8', accent: '#1a8cff', card: '#252527', radius: '3px',
       font: "'Inter', sans-serif", spacing: '0', transform: 'none', fx: '',
@@ -37,6 +38,7 @@ export const PROJECTS = [
     tag: 'gra • 2 graczy',
     url: 'https://michalstankiewicz4-cell.github.io/PatientZero/',
     img: 'assets/img/projects/patientzero.jpg',
+    hoverFx: 'vein',
     theme: {
       bg: '#111c20', fg: '#e6f2ee', accent: '#3ddc97', card: '#1a2a30', radius: '14px',
       font: "'Inter', sans-serif", spacing: '0', transform: 'none', fx: '',

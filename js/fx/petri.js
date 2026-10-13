@@ -115,6 +115,17 @@ function create() {
     }
   }
 
+  // poświata cząstek: gradient od jasnego środka do przezroczystości (rysowany raz na gatunek)
+  const GS = 64;
+  const glow = COLORS.map((col) => {
+    const c = document.createElement('canvas'); c.width = c.height = GS;
+    const g = c.getContext('2d');
+    const gr = g.createRadialGradient(GS / 2, GS / 2, 0, GS / 2, GS / 2, GS / 2);
+    gr.addColorStop(0, col + 'a6'); gr.addColorStop(0.25, col + '55'); gr.addColorStop(0.6, col + '16'); gr.addColorStop(1, col + '00');
+    g.fillStyle = gr; g.fillRect(0, 0, GS, GS);
+    return c;
+  });
+
   function draw() {
     // smugi: pół-przezroczyste przyciemnienie zamiast pełnego czyszczenia
     ctx.globalCompositeOperation = 'source-over';
@@ -135,10 +146,9 @@ function create() {
     }
     for (let s = 0; s < S; s++) {
       ctx.fillStyle = COLORS[s];
-      ctx.globalAlpha = 0.16;                         // poświata
-      ctx.beginPath();
-      for (let i = s; i < N; i += S) { ctx.moveTo(px[i] + CFG.radius * 3.2, py[i]); ctx.arc(px[i], py[i], CFG.radius * 3.2, 0, 6.2832); }
-      ctx.fill();
+      ctx.globalAlpha = 1;                            // poświata: gradient promienisty (sprite)
+      const gr = CFG.radius * 6.5;
+      for (let i = s; i < N; i += S) ctx.drawImage(glow[s], px[i] - gr, py[i] - gr, gr * 2, gr * 2);
       ctx.globalAlpha = 0.95;                         // jądro
       ctx.beginPath();
       for (let i = s; i < N; i += S) { ctx.moveTo(px[i] + CFG.radius, py[i]); ctx.arc(px[i], py[i], CFG.radius, 0, 6.2832); }

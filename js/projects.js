@@ -11,7 +11,21 @@ const HOVER_FX = {
   space: () => import('./fx/space.js'),
   cork: () => import('./fx/cork.js'),
   petri: () => import('./fx/petri.js'),
+  vein: () => import('./fx/vein.js'),
+  matrix: () => import('./fx/matrix.js'),
 };
+
+/** Rozgrzewka: gdy przeglądarka nic nie robi, dociąga moduły efektów i Three.js, żeby pierwsze najechanie nie czekało na sieć. */
+const idle = window.requestIdleCallback ? (f) => requestIdleCallback(f, { timeout: 5000 }) : (f) => setTimeout(f, 2000);
+function warmUp() {
+  if (!matchMedia('(hover: hover)').matches || navigator.connection?.saveData) return;
+  for (const load of Object.values(HOVER_FX)) load().catch(() => {});
+  const link = document.createElement('link');
+  link.rel = 'prefetch'; link.as = 'script';
+  link.href = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  document.head.append(link);
+}
+addEventListener('load', () => idle(warmUp));
 
 /** Placeholder-screen generowany z kolorów motywu (gdy brakuje prawdziwego screena). */
 function placeholder({ title, theme: t }) {
