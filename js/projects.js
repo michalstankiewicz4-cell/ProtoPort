@@ -13,6 +13,7 @@ const HOVER_FX = {
   petri: () => import('./fx/petri.js'),
   vein: () => import('./fx/vein.js'),
   matrix: () => import('./fx/matrix.js'),
+  archive: () => import('./fx/archive.js'),
 };
 
 /** Rozgrzewka: gdy przeglądarka nic nie robi, dociąga moduły efektów i Three.js, żeby pierwsze najechanie nie czekało na sieć. */

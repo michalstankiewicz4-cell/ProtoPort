@@ -74,6 +74,7 @@ export const PROJECTS = [
     tag: 'analiza danych',
     url: 'https://michalstankiewicz4-cell.github.io/NostraDamnOS/',
     img: 'assets/img/projects/nostradamnos.jpg',
+    hoverFx: 'archive',
     theme: {
       bg: '#f0eff8', fg: '#1f2340', accent: '#0a93b8', card: '#ffffff', radius: '16px',
       font: "'Inter', sans-serif", spacing: '0', transform: 'none', fx: '',
