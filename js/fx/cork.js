@@ -14,9 +14,15 @@ const STYLE = `
 body.cork-on .cork-obj { transform: rotate(var(--rot, 0deg)); box-shadow: 0 1px 1px rgba(0,0,0,.28), 5px 9px 16px rgba(40,22,5,.45); }
 body.cork-on .project.cork-obj:hover { transform: rotate(0deg) translateY(-8px) scale(1.02); }
 body.cork-on .photo.cork-obj { border: 9px solid #fbf6e8; border-radius: 3px; }
-body.cork-on .cork-paper { background-color: var(--card); width: fit-content;
-  box-shadow: 0 0 0 12px var(--card), 0 1px 1px 12px rgba(0,0,0,.25), 6px 10px 18px 12px rgba(40,22,5,.4); }
-body.cork-on header > div.cork-paper { width: auto; box-shadow: 0 0 0 14px var(--card), 0 1px 1px 14px rgba(0,0,0,.25), 6px 10px 18px 14px rgba(40,22,5,.4); }
+body.cork-on .cork-paper { background-color: #ffef8a !important; width: fit-content;
+  box-shadow: 0 0 0 12px #ffef8a, 0 1px 1px 12px rgba(0,0,0,.25), 6px 10px 18px 12px rgba(40,22,5,.4); }
+body.cork-on header > div.cork-paper { width: auto; box-shadow: 0 0 0 14px #ffef8a, 0 1px 1px 14px rgba(0,0,0,.25), 6px 10px 18px 14px rgba(40,22,5,.4); }
+body.cork-on .cork-note { background-color: #ffef8a !important; }
+body.cork-on .project.cork-obj { border-color: rgba(120,90,0,.35); }
+body.cork-on .toys .cork-obj { border-color: rgba(120,90,0,.5); opacity: 1; }
+body.cork-on .cork-paper, body.cork-on .cork-paper *, body.cork-on .cork-note, body.cork-on .cork-note *:not(img) { color: #2e2508 !important; text-shadow: none !important; }
+body.cork-on .cork-paper :is(a, button) { border-color: rgba(60,45,0,.55) !important; }
+body.cork-on .toys .cork-obj:hover { background-color: #ffe14d !important; }
 body.cork-on footer.cork-paper { opacity: 1; }
 body.cork-on header { border-bottom-color: transparent; }
 `;
@@ -141,6 +147,7 @@ function create() {
       el.style.setProperty('--rot', `${rot.toFixed(2)}deg`);
     });
     for (const el of papers) el.classList.add('cork-paper');
+    for (const el of [...toys, ...cards]) el.classList.add('cork-note');
   }
 
   function frame(now) {
@@ -190,7 +197,7 @@ function create() {
       clearTimeout(hideTimer);
       hideTimer = setTimeout(() => {
         running = false; cancelAnimationFrame(raf);
-        for (const el of objs) { el.classList.remove('cork-obj', 'cork-paper'); el.style.removeProperty('--rot'); }
+        for (const el of objs) { el.classList.remove('cork-obj', 'cork-paper', 'cork-note'); el.style.removeProperty('--rot'); }
         for (const g of groups) g.replaceChildren();
       }, 1400);
     },

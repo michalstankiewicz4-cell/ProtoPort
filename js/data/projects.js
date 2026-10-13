@@ -95,6 +95,7 @@ export const PROJECTS = [
     tag: 'symulacja • fizyka',
     url: 'https://michalstankiewicz4-cell.github.io/PetrieDish/',
     img: 'assets/img/projects/petriedish.jpg',
+    hoverFx: 'petri',
     theme: {
       bg: '#04050c', fg: '#e8f6ff', accent: '#19e6ff', card: '#0b1022', radius: '14px',
       font: "'Orbitron', sans-serif", spacing: '0.06em', transform: 'uppercase', fx: '',
