@@ -81,6 +81,7 @@ export const PROJECTS = [
     tag: 'gra • 3D',
     url: 'https://michalstankiewicz4-cell.github.io/Hive-Hunger/',
     img: 'assets/img/projects/hivehunger.jpg',
+    hoverFx: 'swarm',
     theme: {
       bg: '#070a1a', fg: '#cfe4ff', accent: '#ffd166', card: '#0e1634', radius: '6px',
       font: "'Share Tech Mono', monospace", spacing: '0.02em', transform: 'none', fx: '',

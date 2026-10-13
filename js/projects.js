@@ -5,6 +5,11 @@ const LIVE_THUMBS = {
   eye: () => import('./thumbs/eye.js'),
 };
 
+/** Efekty po najechaniu na kafelek (klucz = pole `hoverFx`); moduł zwraca funkcję start(card) -> stop(). */
+const HOVER_FX = {
+  swarm: () => import('./fx/swarm.js'),
+};
+
 /** Placeholder-screen generowany z kolorów motywu (gdy brakuje prawdziwego screena). */
 function placeholder({ title, theme: t }) {
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 400'>
@@ -61,6 +66,21 @@ function createCard(project) {
   link.addEventListener('mouseleave', off);
   link.addEventListener('focus', on);
   link.addEventListener('blur', off);
+
+  const loadFx = HOVER_FX[project.hoverFx];
+  if (loadFx) {
+    let stopFx = null, ticket = 0;
+    const fxOn = async () => {
+      const mine = ++ticket;
+      const module = await loadFx().catch(() => null);
+      if (module && mine === ticket) { stopFx?.(); stopFx = module.start(link); }
+    };
+    const fxOff = () => { ticket++; stopFx?.(); stopFx = null; };
+    link.addEventListener('mouseenter', fxOn);
+    link.addEventListener('mouseleave', fxOff);
+    link.addEventListener('focus', fxOn);
+    link.addEventListener('blur', fxOff);
+  }
 
   return link;
 }
