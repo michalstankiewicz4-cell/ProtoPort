@@ -4,6 +4,7 @@
    Mechanika uproszczona z oryginału (przestrzeń zapętlona, siatka sąsiedztwa), tylko Canvas 2D. */
 
 import { adaptiveQuality } from './quality.js';
+import { reduced, resizeGuard } from './kit.js';
 
 const COLORS = ['#19e6ff', '#ff3df0', '#7dff4f', '#ffd23f', '#8a5cff', '#ff6a2b'];
 const CFG = {
@@ -38,7 +39,7 @@ function create() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
   resize();
-  addEventListener('resize', resize);
+  const syncSize = resizeGuard(resize, () => running);
 
   for (let i = 0; i < N; i++) {
     px[i] = Math.random() * W; py[i] = Math.random() * H;
@@ -65,7 +66,6 @@ function create() {
   const mouse = { x: -9999, y: -9999, on: false };
   addEventListener('pointermove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.on = true; });
 
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let running = false, raf = 0, hideTimer = 0, last = 0, Na = N;
   // jakość dopasowana do klatek/s (js/fx/quality.js): mniej cząstek przy słabszej wydajności
   const q = adaptiveQuality({ onLevel: (l) => { Na = Math.min(N, [N, 450, 320, 220][l]); } });
@@ -172,6 +172,7 @@ function create() {
     show() {
       clearTimeout(hideTimer);
       canvas.style.opacity = '1';
+      syncSize();
       q.reset();
       if (!running) { running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
     },

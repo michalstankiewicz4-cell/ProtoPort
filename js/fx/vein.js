@@ -5,7 +5,8 @@
    Shadery: js/vendor/patientzero/shaders.js (skopiowane z gry). Three.js r128 ładuje się z CDN przy pierwszym najechaniu. */
 
 import * as SH from '../vendor/patientzero/shaders.js';
-import { adaptiveQuality } from './quality.js';
+import { adaptiveQuality, weakGpu } from './quality.js';
+import { reduced, resizeGuard } from './kit.js';
 
 const THREE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
 
@@ -207,7 +208,7 @@ async function create() {
     speckMat.uniforms.uPx.value = Hh * 0.9;
   }
   resize();
-  addEventListener('resize', resize);
+  const syncSize = resizeGuard(resize, () => running);
 
   // jakość dopasowana do GPU i do klatek/s (js/fx/quality.js): 1 = bez głębi ostrości, 2 = bez bloomu i niższa rozdzielczość, 3 = mniej krwinek
   function applyLevel(l) {
@@ -216,11 +217,7 @@ async function create() {
     resize();                                         // nowe cele renderu są puste (czarne), więc po wyłączeniu bloomu nic nie zostaje na ekranie
   }
   const q = adaptiveQuality({ onLevel: applyLevel });
-  try {
-    const gl = renderer.getContext(), ext = gl.getExtension('WEBGL_debug_renderer_info');
-    const gpu = ext ? String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)) : '';
-    if (/intel|mali|adreno|powervr|swiftshader|llvmpipe|software|basic render/i.test(gpu)) q.set(1);   // słabsze / programowe GPU: start bez głębi ostrości
-  } catch (e) { /* bez wykrywania */ }
+  if (weakGpu()) q.set(1);   // słabsze / programowe GPU: start bez głębi ostrości
 
   function post(time, focus) {
     renderer.setRenderTarget(T.scene); renderer.clear(); renderer.render(scene, camera);
@@ -244,7 +241,6 @@ async function create() {
   }
 
   // ---------- pętla ----------
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let running = false, raf = 0, hideTimer = 0, last = 0, t = 0, shake = 0, lastBeat = 0;
   const p2 = new THREE.Vector2(), pos = new THREE.Vector3(), scl = new THREE.Vector3(), m4 = new THREE.Matrix4(), dq = new THREE.Quaternion(), ax = new THREE.Vector3(), eu = new THREE.Euler();
 
@@ -317,6 +313,7 @@ async function create() {
     show() {
       clearTimeout(hideTimer);
       canvas.style.opacity = '1';
+      syncSize();
       q.reset();
       if (!running) { running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
     },

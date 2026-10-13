@@ -3,12 +3,12 @@
    z "Matrixa" (katakana, cyfry, hex). Zmieniają się tylko style (klasa na body), treść i klikalność zostają. */
 
 import { adaptiveQuality } from './quality.js';
+import { reduced, SLOW, resizeGuard } from './kit.js';
 
 const GREEN = '#8dff8d';
 const GLYPHS = 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾅﾆﾇﾈﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789ABCDEF:.=*+-<>¦';
 const CFG = { size: 16, fade: 1200, speed: [9, 24], trail: 0.055, headChance: 0.975 };
 
-const SLOW = matchMedia('(prefers-reduced-motion: reduce)').matches ? '0.01s' : '0.9s';
 const STYLE = `
 body.mx-ready, body.mx-ready * { transition: color ${SLOW} ease, background-color ${SLOW} ease, border-color ${SLOW} ease, filter ${SLOW} ease, box-shadow ${SLOW} ease !important; }
 body.mx-on { --bg: #000; --fg: ${GREEN}; --accent: ${GREEN}; --card: rgba(0, 14, 0, .86); --head-transform: none; --head-spacing: 0; background: #000 !important; }
@@ -56,9 +56,8 @@ function create() {
     drops = Array.from({ length: cols * 2 }, (_, k) => ({ x: k % cols, y: rnd(-H * 0.4, H * 1.1) / CFG.size, v: rnd(CFG.speed[0], CFG.speed[1]) }));
   }
   resize();
-  addEventListener('resize', resize);
+  const syncSize = resizeGuard(resize, () => running);
 
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let running = false, raf = 0, hideTimer = 0, last = 0, active = -1;
   // jakość dopasowana do klatek/s (js/fx/quality.js): mniej kolumn deszczu przy słabszej wydajności
   const q = adaptiveQuality({ onLevel: (l) => { active = Math.floor(drops.length * [1, 0.6, 0.4, 0.25][l]); } });
@@ -99,6 +98,7 @@ function create() {
       void document.body.offsetWidth;
       document.body.classList.add('mx-on');
       canvas.style.opacity = '1';
+      syncSize();
       q.reset();
       if (!running) { running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
     },

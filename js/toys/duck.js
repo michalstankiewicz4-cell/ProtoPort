@@ -46,6 +46,7 @@ function comment(target) {
 let lastEl = null;
 function over(e) {
   tx = e.clientX + 22; ty = e.clientY + 24;
+  if (!raf && on) raf = requestAnimationFrame(loop);
   if (e.target === lastEl) return;
   lastEl = e.target;
   const text = comment(e.target);
@@ -56,7 +57,9 @@ function over(e) {
 function loop() {
   x += (tx - x) * 0.12; y += (ty - y) * 0.12;
   duck.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
-  raf = on && !document.hidden ? requestAnimationFrame(loop) : 0;
+  // gdy kaczuszka dogoniła kursor, pętla odpoczywa do następnego ruchu myszy
+  const still = Math.abs(tx - x) < 0.3 && Math.abs(ty - y) < 0.3;
+  raf = on && !document.hidden && !still ? requestAnimationFrame(loop) : 0;
 }
 
 export function duckSay(text) { if (on) say(text); }

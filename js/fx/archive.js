@@ -6,7 +6,7 @@
 const STAMPS = [['NIEJAWNE', '#b3261e'], ['TAJNE', '#b3261e'], ['POUFNE', '#1f3f8a'], ['DO WGLĄDU', '#1f3f8a'], ['ZASTRZEŻONE', '#b3261e'], ['ARCHIWUM', '#2c5a35']];
 const PAPER = '#eadfc0';
 const INK = '#2a2216';
-const SLOW = matchMedia('(prefers-reduced-motion: reduce)').matches ? '0.01s' : '0.9s';
+import { SLOW, rand } from './kit.js';
 
 const STYLE = `
 .arc-obj { position: relative; transition: transform ${SLOW} cubic-bezier(.2,.8,.2,1), box-shadow ${SLOW} ease, background-color ${SLOW} ease,
@@ -41,7 +41,6 @@ body.arc-on .arc-redact { transform: scaleX(1); }
 body.arc-on .arc-clip { opacity: 1; }
 `;
 
-const rand = (i, k) => { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x); };
 const SVGNS = 'http://www.w3.org/2000/svg';
 
 /** Płytka sukna 160×160 (szczegóły "zawijają się"). */

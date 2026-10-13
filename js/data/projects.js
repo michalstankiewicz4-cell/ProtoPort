@@ -13,7 +13,7 @@ export const PROJECTS = [
     desc: 'Narzędzie do skanowania i audytu adresów IP.',
     tag: 'narzędzie • sieci',
     url: 'https://github.com/michalstankiewicz4-cell/IPscanner',
-    img: 'assets/img/projects/ipscanner.jpg',
+    img: 'assets/img/projects/ipscanner.webp',
     hoverFx: 'matrix',
     theme: {
       bg: '#1b1b1d', fg: '#d8d8d8', accent: '#1a8cff', card: '#252527', radius: '3px',
@@ -25,7 +25,7 @@ export const PROJECTS = [
     desc: 'Teczki, dane, wszystko pod obserwacją.',
     tag: 'aplikacja web',
     url: 'https://michalstankiewicz4-cell.github.io/monitoringobywatelski/',
-    img: 'assets/img/projects/monitoring.jpg',
+    img: 'assets/img/projects/monitoring.webp',
     liveThumb: 'eye',
     theme: {
       bg: '#2a0606', fg: '#f6dede', accent: '#ff1f1f', card: '#400b0b', radius: '0px',
@@ -37,7 +37,7 @@ export const PROJECTS = [
     desc: 'Rak kontra lekarz: gra dla dwóch osób w jednym oknie.',
     tag: 'gra • 2 graczy',
     url: 'https://michalstankiewicz4-cell.github.io/PatientZero/',
-    img: 'assets/img/projects/patientzero.jpg',
+    img: 'assets/img/projects/patientzero.webp',
     hoverFx: 'vein',
     theme: {
       bg: '#111c20', fg: '#e6f2ee', accent: '#3ddc97', card: '#1a2a30', radius: '14px',
@@ -49,7 +49,7 @@ export const PROJECTS = [
     desc: 'Swarm Protocol: strategia kosmiczna z flotą i badaniami.',
     tag: 'gra • strategia',
     url: 'https://michalstankiewicz4-cell.github.io/Space/',
-    img: 'assets/img/projects/space.jpg',
+    img: 'assets/img/projects/space.webp',
     hoverFx: 'space',
     theme: {
       bg: '#02030c', fg: '#e8ecff', accent: '#f4b04a', card: '#0b1236', radius: '24px',
@@ -61,7 +61,7 @@ export const PROJECTS = [
     desc: 'Cyfrowa tablica korkowa z karteczkami i nićmi.',
     tag: 'narzędzie',
     url: 'https://michalstankiewicz4-cell.github.io/CorkBoard/',
-    img: 'assets/img/projects/corkboard.jpg',
+    img: 'assets/img/projects/corkboard.webp',
     hoverFx: 'cork',
     theme: {
       bg: '#a8743c', fg: '#2a1a0e', accent: '#d9482b', card: '#f7efdc', radius: '3px',
@@ -73,7 +73,7 @@ export const PROJECTS = [
     desc: 'Parlament P.I.M.P.: analiza wypowiedzi parlamentarnych.',
     tag: 'analiza danych',
     url: 'https://michalstankiewicz4-cell.github.io/NostraDamnOS/',
-    img: 'assets/img/projects/nostradamnos.jpg',
+    img: 'assets/img/projects/nostradamnos.webp',
     hoverFx: 'archive',
     theme: {
       bg: '#f0eff8', fg: '#1f2340', accent: '#0a93b8', card: '#ffffff', radius: '16px',
@@ -85,7 +85,7 @@ export const PROJECTS = [
     desc: 'Rój pożera planetę blok po bloku.',
     tag: 'gra • 3D',
     url: 'https://michalstankiewicz4-cell.github.io/Hive-Hunger/',
-    img: 'assets/img/projects/hivehunger.jpg',
+    img: 'assets/img/projects/hivehunger.webp',
     hoverFx: 'swarm',
     theme: {
       bg: '#070a1a', fg: '#cfe4ff', accent: '#ffd166', card: '#0e1634', radius: '6px',
@@ -97,7 +97,7 @@ export const PROJECTS = [
     desc: 'Symulacja płynów i silnik fizyki, neonowe cząsteczki.',
     tag: 'symulacja • fizyka',
     url: 'https://michalstankiewicz4-cell.github.io/PetrieDish/',
-    img: 'assets/img/projects/petriedish.jpg',
+    img: 'assets/img/projects/petriedish.webp',
     hoverFx: 'petri',
     theme: {
       bg: '#04050c', fg: '#e8f6ff', accent: '#19e6ff', card: '#0b1022', radius: '14px',

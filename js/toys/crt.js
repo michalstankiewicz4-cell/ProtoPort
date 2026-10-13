@@ -25,6 +25,23 @@ function bulgeFilter() {
   document.body.append(svg);
 }
 
+/* Wypukłość to filtr na całym `main` — przy przewijaniu na słabszym sprzęcie bywa kosztowna.
+   Podczas przewijania mierzymy klatki/s; gdy przez ~0,7 s jest poniżej progu, zostaje sam CRT bez zakrzywienia (klasa crt-flat). */
+let measuring = 0, frames = 0, t0 = 0, lastScroll = 0;
+function measure(now) {
+  if (!document.body.classList.contains('crt-on') || document.body.classList.contains('crt-flat')) { measuring = 0; return; }
+  frames++;
+  if (now - t0 >= 700) {
+    if (frames / ((now - t0) / 1000) < 38) { document.body.classList.add('crt-flat'); measuring = 0; return; }
+    frames = 0; t0 = now;
+  }
+  measuring = now - lastScroll < 1200 ? requestAnimationFrame(measure) : 0;
+}
+function onScroll() {
+  lastScroll = performance.now();
+  if (!measuring && !document.hidden) { frames = 0; t0 = lastScroll; measuring = requestAnimationFrame(measure); }
+}
+
 export function setCrt(on) {
   if (!overlay) {
     overlay = document.createElement('div');
@@ -32,7 +49,9 @@ export function setCrt(on) {
     overlay.setAttribute('aria-hidden', 'true');
     document.body.append(overlay);
     bulgeFilter();
+    addEventListener('scroll', onScroll, { capture: true, passive: true });   // przewija się `.scroll`, nie okno
   }
+  document.body.classList.remove('crt-flat');
   document.body.classList.toggle('crt-on', on);
   stopHum?.(); stopHum = null;
   if (on) stopHum = ambient('hum');

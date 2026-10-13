@@ -1,11 +1,14 @@
-import { HOVER_FX } from '../projects.js';
+import { FX } from '../fx/registry.js';
+import { loadFx, startFx } from '../fx/controller.js';
+import { weakGpu } from '../fx/quality.js';
 import { playFanfare, ambient } from './audio.js';
 import { degauss } from './degauss.js';
 import { duckSay } from './duck.js';
 
 /** Ukryty tryb Konami: ↑ ↑ ↓ ↓ ← → ← → B A odpala na kilka sekund efekty tła naraz (te rysowane na płótnach, bez zmian stylu strony). */
 const CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-const LAYERS = ['swarm', 'space', 'petri', 'vein'];
+// warstwy tła z rejestru (typ 'canvas'; efekty zmieniające styl strony pomijamy), bez ciężkich na słabym GPU
+const layers = () => Object.keys(FX).filter((k) => FX[k].kind === 'canvas' && !(FX[k].heavy && weakGpu()));
 const DURATION = 7000;
 let pos = 0, busy = false;
 
@@ -20,8 +23,8 @@ async function party() {
   duckSay('Konami! Wszystko naraz!');
   const card = document.querySelector('.project') || document.body;
   const stops = [];
-  for (const key of LAYERS) {
-    try { stops.push((await HOVER_FX[key]()).start(card)); } catch { /* ten efekt się nie załadował — reszta gra dalej */ }
+  for (const key of layers()) {
+    try { const mod = await loadFx(key); if (mod) stops.push(startFx(key, mod, card)); } catch { /* ten efekt się nie załadował — reszta gra dalej */ }
   }
   degauss();
   await new Promise((r) => setTimeout(r, DURATION));

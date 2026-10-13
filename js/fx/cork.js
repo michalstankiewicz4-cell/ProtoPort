@@ -6,7 +6,7 @@
 const PIN_COLORS = [['#ff7a5c', '#d9482b', '#7c1d0c'], ['#6fa2f2', '#2f6fd0', '#173b7a'], ['#ffe27a', '#e7b92c', '#8a6a0a'], ['#6fdc9a', '#2f9e5a', '#145a30']];
 const THREADS = ['#c0281f', '#2a62b8', '#2f8a3e', '#e0a21b'];   // czerwona, niebieska, zielona, żółta
 const T = { pin: 250, pinStep: 70, thread: 800, threadWait: 250 };   // ms
-const SLOW = matchMedia('(prefers-reduced-motion: reduce)').matches ? '0.01s' : '0.9s';
+import { SLOW, rand } from './kit.js';
 
 const STYLE = `
 .cork-obj { position: relative; transition: transform ${SLOW} cubic-bezier(.2,.8,.2,1), box-shadow ${SLOW} ease, background-color ${SLOW} ease,
@@ -27,7 +27,6 @@ body.cork-on footer.cork-paper { opacity: 1; }
 body.cork-on header { border-bottom-color: transparent; }
 `;
 
-const rand = (i, k) => { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x); };
 const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
 const ease = (p) => 1 - Math.pow(1 - p, 3);
 const SVGNS = 'http://www.w3.org/2000/svg';

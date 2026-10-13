@@ -1,30 +1,17 @@
 import { applyTheme, DEFAULT_THEME } from './theme.js';
-import { ambient } from './toys/audio.js';
-
-/** Dźwięki otoczenia dla efektów (grają tylko przy włączonym przełączniku "Dźwięk"). */
-const AMBIENT = { vein: ['heart'], matrix: ['rain', 'hum'], archive: ['stamp'] };
+import { FX } from './fx/registry.js';
+import { bindFx } from './fx/controller.js';
 
 /** Żywe miniatury ładowane na żądanie (klucz = pole `liveThumb` w js/data/projects.js). */
 const LIVE_THUMBS = {
   eye: () => import('./thumbs/eye.js'),
 };
 
-/** Efekty po najechaniu na kafelek (klucz = pole `hoverFx`); moduł zwraca funkcję start(card) -> stop(). */
-export const HOVER_FX = {
-  swarm: () => import('./fx/swarm.js'),
-  space: () => import('./fx/space.js'),
-  cork: () => import('./fx/cork.js'),
-  petri: () => import('./fx/petri.js'),
-  vein: () => import('./fx/vein.js'),
-  matrix: () => import('./fx/matrix.js'),
-  archive: () => import('./fx/archive.js'),
-};
-
 /** Rozgrzewka: gdy przeglądarka nic nie robi, dociąga moduły efektów i Three.js, żeby pierwsze najechanie nie czekało na sieć. */
 const idle = window.requestIdleCallback ? (f) => requestIdleCallback(f, { timeout: 5000 }) : (f) => setTimeout(f, 2000);
 function warmUp() {
   if (!matchMedia('(hover: hover)').matches || navigator.connection?.saveData) return;
-  for (const load of Object.values(HOVER_FX)) load().catch(() => {});
+  for (const { load } of Object.values(FX)) load().catch(() => {});
   const link = document.createElement('link');
   link.rel = 'prefetch'; link.as = 'script';
   link.href = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
@@ -49,6 +36,7 @@ function createShot(project) {
   shot.className = 'shot';
   shot.alt = `Zrzut ekranu projektu ${project.title}`;
   shot.loading = 'lazy';
+  shot.decoding = 'async';
   shot.addEventListener('error', () => { shot.src = placeholder(project); }, { once: true });
   shot.src = project.img || placeholder(project);
 
@@ -89,26 +77,7 @@ function createCard(project) {
   link.addEventListener('focus', on);
   link.addEventListener('blur', off);
 
-  const loadFx = HOVER_FX[project.hoverFx];
-  if (loadFx) {
-    let stopFx = null, ticket = 0;
-    const fxOn = async () => {
-      const mine = ++ticket;
-      const module = await loadFx().catch(() => null);
-      if (module && mine === ticket) {
-        stopFx?.();
-        const stop = module.start(link);
-        const sounds = (AMBIENT[project.hoverFx] || []).map(ambient);
-        stopFx = () => { stop(); sounds.forEach((s) => s()); };
-      }
-    };
-    const fxOff = () => { ticket++; stopFx?.(); stopFx = null; };
-    link.addEventListener('mouseenter', fxOn);
-    link.addEventListener('mouseleave', fxOff);
-    link.addEventListener('focus', fxOn);
-    link.addEventListener('blur', fxOff);
-    document.addEventListener('visibilitychange', () => { if (document.hidden) fxOff(); });   // karta w tle: efekt się zatrzymuje
-  }
+  bindFx(link, project.hoverFx);
 
   return link;
 }

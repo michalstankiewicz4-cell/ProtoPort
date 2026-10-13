@@ -20,3 +20,17 @@ export function adaptiveQuality({ onLevel, max = 3, low = 42, windows = 2 }) {
     set(l) { level = Math.min(max, Math.max(level, l)); onLevel(level); },
   };
 }
+
+let weak;
+/** Czy przeglądarka rysuje WebGL na słabym lub programowym GPU (zintegrowane/mobilne/swiftshader). Wynik jest zapamiętany. */
+export function weakGpu() {
+  if (weak !== undefined) return weak;
+  weak = false;
+  try {
+    const gl = document.createElement('canvas').getContext('webgl');
+    const ext = gl && gl.getExtension('WEBGL_debug_renderer_info');
+    if (ext) weak = /intel|mali|adreno|powervr|swiftshader|llvmpipe|software|basic render/i.test(String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)));
+    gl?.getExtension('WEBGL_lose_context')?.loseContext();
+  } catch { /* bez wykrywania */ }
+  return weak;
+}

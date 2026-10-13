@@ -29,7 +29,7 @@ index.html                 szkielet, SEO, linki do CSS i js/main.js
 assets/css/                base, layout, components, thumbs, toys (.css)
 assets/img/                zdjęcie, og-image, screeny projektów (projects/)
 js/main.js                 renderProjects + initToys + initCopyButtons
-js/projects.js             kafelki, HOVER_FX, AMBIENT, rozgrzewka (warmUp)
+js/projects.js             kafelki (screeny .webp), rozgrzewka (warmUp), podpięcie efektu: bindFx(link, hoverFx)
 js/theme.js                applyTheme (zmienne CSS na <html>, klasy body)
 js/data/projects.js        lista projektów (title, desc, tag, url, img, theme, hoverFx, liveThumb)
 js/fx/                     efekty tła po najechaniu (patrz niżej) + quality.js
@@ -40,9 +40,12 @@ js/vendor/                 bodykit (Space), patientzero/shaders.js (shadery z gr
 
 ## Efekty po najechaniu (`js/fx/`)
 
-Pole `hoverFx` w `js/data/projects.js` → `HOVER_FX` w `js/projects.js` (lazy `import()`). Moduł eksportuje `start(card)`,
-które zwraca `stop()`. Kafelek wywołuje je na `mouseenter/focus` i kończy na `mouseleave/blur`, z licznikiem `ticket`
-(wyścigi przy szybkim przechodzeniu) i zatrzymaniem przy ukrytej karcie (`visibilitychange`).
+Pole `hoverFx` w `js/data/projects.js` → wpis w **`js/fx/registry.js`** (`load` = lazy `import()`, `kind` = `canvas` albo `theme`,
+`heavy`, `ambient` = dźwięki). Moduł eksportuje `start(card)`, które zwraca `stop()`. **`js/fx/controller.js`** (`bindFx`, `startFx`)
+wywołuje je na `mouseenter/focus`, kończy na `mouseleave/blur`, pilnuje wyścigów (`ticket`), stopu przy ukrytej karcie,
+dźwięku otoczenia i tego, że **naraz działa najwyżej jeden efekt typu `theme`** (matrix/archive/cork). **`js/fx/kit.js`** to wspólne
+`reduced`, `SLOW`, `rand`, `resizeGuard` (przelicza rozmiar tylko przy działającym efekcie). **Nowy efekt = plik w `js/fx/` + wpis w rejestrze.**
+`weakGpu()` w `quality.js` wykrywa słabe/programowe GPU (żyła startuje od niższej jakości, Konami pomija efekty `heavy`).
 
 | Projekt | hoverFx | Co robi |
 |---|---|---|
@@ -68,15 +71,15 @@ Rejestr `TOYS` w `js/toys/index.js`: `{label, run}` (jednorazowa) albo `{label, 
 - **📺 Rozmagnesuj kineskop** (`degauss.js`): filtr SVG na `main` + poświata, 2 s.
 - **📼 Skaner CRT/VHS** (`crt.js` + style `.crt-*`): linie skanowania, winieta, zaokrąglone rogi, drżenie (`translate` na `header`/`.scroll`),
   aberracja chromatyczna (`text-shadow` przez `:where`, więc efekty ją nadpisują), wypukłość kineskopu (SVG `feDisplacementMap`
-  z mapą generowaną na canvasie, `filter` na `main`), brum 50/100 Hz.
+  z mapą generowaną na canvasie, `filter` na `main`; gdy przewijanie szarpie (<38 FPS przez ~0,7 s) włącza się `crt-flat` i zostaje sam CRT bez zakrzywienia), brum 50/100 Hz.
 - **🔦 Pstryk lampy** (`lamp.js`): ciemna nakładka z gradientem radialnym podążającym za kursorem.
 - **🌈 Kreska za kursorem** (`trail.js`): canvas, stany: wył. / tęcza / kolor projektu (`--accent`).
 - **🦆 Gumowa kaczuszka** (`duck.js`): podąża za kursorem, komentuje kafelki (dopasowanie tytułu `h3` regexem) i elementy strony;
   nowy komentarz pojawia się od razu, ten sam nie powtarza się.
 - **Konami** (`konami.js`, bez przycisku): ↑↑↓↓←→←→BA → na 7 s efekty `swarm, space, petri, vein` naraz + rozmagnesowanie + fanfara.
-  Pomija `matrix/archive/cork`, bo zmieniają style strony i kolidowałyby.
+  Bierze z rejestru efekty `kind: 'canvas'` (bez `heavy` na słabym GPU); `theme` pomija, bo zmieniają style strony i kolidowałyby.
 - **Dźwięk** (`audio.js`, Web Audio, bez plików): wspólny `AudioContext` + master; `ambient(kind)` z licznikiem odwołań:
-  `heart` (lub/dub z gry, lowpass 700 Hz „pod wodą”, szum krwi), `hum`, `rain`, `stamp`. Mapa `AMBIENT` w `js/projects.js`:
+  `heart` (lub/dub z gry, lowpass 700 Hz „pod wodą”, szum krwi), `hum`, `rain`, `stamp`. Pole `ambient` w rejestrze efektów:
   vein→heart, matrix→rain+hum, archive→stamp. Przeglądarka odblokuje dźwięk dopiero po pierwszym kliknięciu na stronie.
 
 ## Pułapki (czego już się nauczyliśmy)

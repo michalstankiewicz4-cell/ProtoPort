@@ -3,6 +3,8 @@
    Niebo i Słońce to ten sam kod co w grze (BodyKit, js/vendor/bodykit/), Three.js r128 ładuje się z CDN.
    Wszystko dociąga się dopiero przy pierwszym najechaniu i zostaje w pamięci. */
 
+import { reduced, resizeGuard } from './kit.js';
+
 const THREE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
 const KIT_FILES = ['bodykit.js', 'suns.js', 'sky.js'];          // kolejność ma znaczenie
 
@@ -70,7 +72,6 @@ async function create() {
   }
   frameCamera();
 
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let t = 0, last = 0, running = false, raf = 0, hideTimer = 0;
 
   function frame(now) {
@@ -92,10 +93,10 @@ async function create() {
     renderer.render(scene, camera);
   }
 
-  addEventListener('resize', () => {
+  const syncSize = resizeGuard(() => {
     renderer.setSize(innerWidth, innerHeight, false);
     frameCamera();
-  });
+  }, () => running);
 
   // pierwsze wypalenie mgławic (jednorazowe) zanim tło się pokaże
   camera.position.set(ORBIT.distance, 0, 0);
@@ -108,6 +109,7 @@ async function create() {
     show() {
       clearTimeout(hideTimer);
       canvas.style.opacity = '1';
+      syncSize();
       if (!running) { running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
     },
     hide() {
