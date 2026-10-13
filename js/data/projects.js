@@ -48,6 +48,7 @@ export const PROJECTS = [
     tag: 'gra • strategia',
     url: 'https://michalstankiewicz4-cell.github.io/Space/',
     img: 'assets/img/projects/space.jpg',
+    hoverFx: 'space',
     theme: {
       bg: '#02030c', fg: '#e8ecff', accent: '#f4b04a', card: '#0b1236', radius: '24px',
       font: "'Antonio', sans-serif", spacing: '0.05em', transform: 'uppercase', fx: '',

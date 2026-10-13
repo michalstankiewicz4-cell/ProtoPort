@@ -8,6 +8,7 @@ const LIVE_THUMBS = {
 /** Efekty po najechaniu na kafelek (klucz = pole `hoverFx`); moduł zwraca funkcję start(card) -> stop(). */
 const HOVER_FX = {
   swarm: () => import('./fx/swarm.js'),
+  space: () => import('./fx/space.js'),
 };
 
 /** Placeholder-screen generowany z kolorów motywu (gdy brakuje prawdziwego screena). */
