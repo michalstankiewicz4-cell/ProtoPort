@@ -94,7 +94,7 @@ Rejestr `TOYS` w `js/toys/index.js`: `{label, run}` (jednorazowa) albo `{label, 
 
 ## Podgląd w artefakcie i narzędzia pomocnicze (poza repo)
 
-- **Artefakt podglądu:** https://claude.ai/artifact/ADSA21sx7YRE1uH4XWSCo7 — jedna strona, składana skryptem `mk.py` z sandboxu
+- **Artefakt podglądu** (dawny https://claude.ai/artifact/ADSA21sx7YRE1uH4XWSCo7 został usunięty; ostatnio testujemy na GitHub Pages) — jedna strona, składana skryptem `mk.py` z sandboxu
   (moduły z repo zawijane w IIFE, importy usuwane). Po zmianie kodu w repo trzeba przebudować i opublikować ponownie.
   Jeśli sandbox zniknął: odtworzyć pipeline lub testować repo przez `python -m http.server` + Playwright (Chromium).
 - **PC (Windows):** PowerShell `-Command` zjada `$` — zawsze uruchamiać skrypty `.ps1` (`powershell -ExecutionPolicy Bypass -File ...`).

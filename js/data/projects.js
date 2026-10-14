@@ -182,6 +182,13 @@ export const PROJECTS = [
     early: true,
   },
   {
+    title: 'Deep Dive',
+    desc: 'Podróż wewnątrz komputera: zmniejszasz swój rozmiar aż do atomu.',
+    tag: 'wczesna wersja • gra',
+    url: 'https://michalstankiewicz4-cell.github.io/DeepDive/',
+    early: true,
+  },
+  {
     title: 'Vibe-coding life hacki',
     desc: 'Life hacki do vibecodingu.',
     tag: 'wczesny pomysł • poradnik',
