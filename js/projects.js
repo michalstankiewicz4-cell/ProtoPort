@@ -20,7 +20,7 @@ function warmUp() {
 addEventListener('load', () => idle(warmUp));
 
 /** Placeholder-screen generowany z kolorów motywu (gdy brakuje prawdziwego screena). */
-function placeholder({ title, theme: t }) {
+function placeholder({ title, theme: t = DEFAULT_THEME }) {
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 400'>
     <rect width='640' height='400' fill='${t.bg}'/>
     <circle cx='480' cy='140' r='110' fill='${t.accent}' opacity='.25'/>
@@ -70,18 +70,36 @@ function createCard(project) {
 
   link.append(createShot(project), info);
 
-  const on = () => applyTheme(project.theme, true);
-  const off = () => applyTheme(DEFAULT_THEME, false);
-  link.addEventListener('mouseenter', on);
-  link.addEventListener('mouseleave', off);
-  link.addEventListener('focus', on);
-  link.addEventListener('blur', off);
+  if (project.early) link.classList.add('early');          // wczesne pomysły: bez zmiany motywu i bez efektów
+  else {
+    const on = () => applyTheme(project.theme, true);
+    const off = () => applyTheme(DEFAULT_THEME, false);
+    link.addEventListener('mouseenter', on);
+    link.addEventListener('mouseleave', off);
+    link.addEventListener('focus', on);
+    link.addEventListener('blur', off);
+  }
 
   bindFx(link, project.hoverFx);
 
   return link;
 }
 
+/** Gotowe projekty trafiają do głównej siatki, wczesne pomysły do osobnej sekcji pod linią. */
 export function renderProjects(container, projects) {
-  container.replaceChildren(...projects.map(createCard));
+  const ready = projects.filter((p) => !p.early), early = projects.filter((p) => p.early);
+  container.replaceChildren(...ready.map(createCard));
+  if (!early.length) return;
+  const section = document.createElement('section');
+  section.className = 'early-section';
+  const title = document.createElement('h2');
+  title.textContent = 'Wczesne pomysły';
+  const note = document.createElement('p');
+  note.className = 'early-note';
+  note.textContent = 'Początek drogi: wczesne wersje i pomysły, które dopiero się rozkręcają.';
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+  grid.append(...early.map(createCard));
+  section.append(title, note, grid);
+  container.after(section);
 }

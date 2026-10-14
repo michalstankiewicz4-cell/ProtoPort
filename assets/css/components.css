@@ -72,6 +72,13 @@ header h1 { letter-spacing: 0; text-transform: none; }
 .info p { font-size: .9rem; opacity: .75; }
 .tag { display: inline-block; margin-top: 10px; font-size: .75rem; color: var(--accent); }
 
+/* ----- Wczesne pomysły: oddzielone linią, spokojniejsze kafelki bez efektów ----- */
+.early-section { margin-top: 64px; padding-top: 32px; border-top: 1px solid color-mix(in srgb, var(--fg) 25%, transparent); }
+.early-section h2 { margin-bottom: 6px; }
+.early-note { margin-bottom: 24px; font-size: .9rem; opacity: .6; }
+.project.early { border-style: dashed; border-color: color-mix(in srgb, var(--fg) 22%, transparent); }
+.project.early .shot { opacity: .75; }
+
 @media (max-width: 600px) {
   .photo { width: 84px; height: 84px; }
   h1 { font-size: 1.5rem; }

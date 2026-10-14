@@ -31,7 +31,7 @@ assets/img/                zdjęcie, og-image, screeny projektów (projects/)
 js/main.js                 renderProjects + initToys + initCopyButtons
 js/projects.js             kafelki (screeny .webp), rozgrzewka (warmUp), podpięcie efektu: bindFx(link, hoverFx)
 js/theme.js                applyTheme (zmienne CSS na <html>, klasy body)
-js/data/projects.js        lista projektów (title, desc, tag, url, img, theme, hoverFx, liveThumb)
+js/data/projects.js        lista projektów (title, desc, tag, url, img, theme, hoverFx, liveThumb, early); `early: true` = sekcja „Wczesne pomysły” pod linią, bez theme i hoverFx (renderProjects w js/projects.js); brak `img` = placeholder z kolorów motywu
 js/fx/                     efekty tła po najechaniu (patrz niżej) + quality.js
 js/thumbs/eye.js           żywa miniatura Monitoringu
 js/toys/                   zabawki: audio, degauss, crt, lamp, trail, duck, konami, index (rejestr)
