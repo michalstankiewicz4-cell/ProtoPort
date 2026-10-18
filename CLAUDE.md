@@ -28,7 +28,10 @@ i aktualizuj sekcje „Stan” i „Decyzje” po każdym większym wydaniu.
 index.html                 szkielet, SEO, linki do CSS i js/main.js
 assets/css/                base, layout, components, thumbs, toys (.css)
 assets/img/                zdjęcie, og-image, screeny projektów (projects/)
-js/main.js                 renderProjects + initToys + initCopyButtons
+js/main.js                 renderProjects + initToys + initCopyButtons + initLang
+js/lang.js                 przełącznik PL/CN (flagi SVG) w prawym górnym rogu bloku z imieniem: CN = słownik zh (na oko,
+                           „Zabawki” celowo → 裹面糊的鸡肉) + klasa `flipped` na <html> obraca `main` i `.toys` o 180°
+                           (style w components.css); warstwy fx zostają w układzie ekranu; oko (eye.js) odwraca wzrok przy `flipped`
 js/projects.js             kafelki (screeny .webp), rozgrzewka (warmUp), podpięcie efektu: bindFx(link, hoverFx)
 js/theme.js                applyTheme (zmienne CSS na <html>, klasy body)
 js/data/projects.js        lista projektów (title, desc, tag, url, img, theme, hoverFx, liveThumb, early); `early: true` = sekcja „Wczesne pomysły” pod linią, bez theme i hoverFx (renderProjects w js/projects.js); brak `img` = placeholder z kolorów motywu

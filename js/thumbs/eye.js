@@ -216,7 +216,7 @@ export function mount(wrap) {
     if (!visible) return;
     f++;
     let tx = 0, ty = 0;
-    if (pointer) { const r = wrap.getBoundingClientRect(); tx = clamp((pointer.x - (r.left + r.width / 2)) / 260, -1, 1); ty = clamp((pointer.y - (r.top + r.height / 2)) / 200, -1, 1); }
+    if (pointer) { const r = wrap.getBoundingClientRect(); tx = clamp((pointer.x - (r.left + r.width / 2)) / 260, -1, 1); ty = clamp((pointer.y - (r.top + r.height / 2)) / 200, -1, 1); if (document.documentElement.classList.contains('flipped')) { tx = -tx; ty = -ty; } }   // strona obrócona o 180° (js/lang.js)
     gaze.x += (tx - gaze.x) * 0.16; gaze.y += (ty - gaze.y) * 0.16;
     if (f % 3 === 1) mist(t);
     eyeBg(t);

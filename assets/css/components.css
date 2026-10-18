@@ -48,6 +48,32 @@ header h1 { letter-spacing: 0; text-transform: none; }
 .contact { display: flex; gap: 10px; flex-wrap: wrap; }
 .copy { min-width: 3em; text-align: center; }
 
+/* ----- Przełącznik języka PL / CN (js/lang.js): prawy górny róg bloku z imieniem, nad przyciskiem kopiowania ----- */
+header > div { position: relative; }
+.lang {
+  position: absolute; top: 0; right: 0; z-index: 2;
+  display: flex; border: 1px solid var(--accent); border-radius: var(--radius); overflow: hidden;
+}
+.lang button {
+  font: inherit; font-size: .8rem; color: var(--fg); background: transparent; border: 0;
+  display: flex; align-items: center; gap: 6px; padding: 5px 10px; cursor: pointer;
+  transition: background .25s, color .25s;
+}
+.lang button + button { border-left: 1px solid var(--accent); }
+.lang button:hover { background: color-mix(in srgb, var(--accent) 28%, transparent); }
+.lang button[aria-pressed="true"] { background: var(--accent); color: var(--bg); }
+.lang svg { width: 18px; height: 12px; display: block; border-radius: 2px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .25); }
+@media (max-width: 600px) { .lang button { padding: 4px 7px; font-size: .7rem; } }
+
+/* Tryb CN: strona do góry nogami. Obracamy tylko treść i panel zabawek — warstwy efektów (fixed na body)
+   zostają w układzie ekranu, więc kursor, lampa, kreska i kaczuszka trafiają tam, gdzie trzeba. */
+main, .toys { transition: transform 1.1s cubic-bezier(.6, -.25, .3, 1.25); }
+html.flipped main { transform: rotate(180deg); }
+/* Panel zabawek obraca się wokół środka ekranu (nie własnego), więc ląduje po lewej; 514px = 490 + 24 z toys.css */
+.toys { transform-origin: -514px calc(50vh - 40px); }
+html.flipped .toys { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { main, .toys { transition: none; } }
+
 /* ----- Kafelek projektu ----- */
 .project {
   display: block;
