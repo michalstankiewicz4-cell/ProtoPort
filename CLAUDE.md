@@ -26,7 +26,10 @@ i aktualizuj sekcje „Stan” i „Decyzje” po każdym większym wydaniu.
 
 ```
 index.html                 szkielet, SEO, linki do CSS i js/main.js
-assets/css/                base, layout, components, thumbs, toys (.css)
+assets/css/                base, layout, components, thumbs, toys, credit (.css)
+                             credit.css = logo 4programmers.net (w nav.links między GitHub a telefonem, z-index 20, biała plakietka,
+                             szklany tooltip z podziękowaniem); SVG logo wklejone inline w index.html
+                             (wyśledzone z PNG 29x35 — jeśli będzie oficjalne SVG, podmień <path>)
 assets/img/                zdjęcie, og-image, screeny projektów (projects/)
 js/main.js                 renderProjects + initToys + initCopyButtons + initLang
 js/lang.js                 przełącznik PL/CN (flagi SVG) w prawym górnym rogu bloku z imieniem: CN = słownik zh (na oko,
